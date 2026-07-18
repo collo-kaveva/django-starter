@@ -1,59 +1,74 @@
-# Django Project Starter Template
+# NetVista - Modern Network Management Dashboard Simulator
 
-> Django (Server Only) starter template, inherited from [SaaS Pegasus](https://www.saaspegasus.com/).
+> A modern, responsive network management dashboard simulator inspired by professional router interfaces like Tenda, TP-Link Omada, UniFi Network, and Cisco Meraki.
 
-This project runs in **two distinct modes**:
+NetVista is a **simulation-only** application designed for demonstration and educational purposes. It does not access, scan, or control real networks. All devices, analytics, traffic data, and statistics are generated from the application's database.
 
-| Mode | How it runs | Database | Cache / broker | Celery | Used for |
-|------|-------------|----------|----------------|--------|----------|
-| **Local** | Natively on your machine via [uv](https://docs.astral.sh/uv/) + `npm` | SQLite (`db.sqlite3`) | DummyCache (no Redis needed) | Eager (synchronous) | Day-to-day development |
-| **Production** | Docker Compose (Postgres + Redis + web + Vite + Celery) | Postgres | Redis | Real worker + beat | Containerized / deployed stack |
+## Features
 
-The split is driven by `DEBUG` and a few environment variables — see [Configuration](#configuration). You do
-**not** need Docker for everyday development.
+### Core Functionality
+- **Interactive Dashboard**: Real-time network statistics with charts and widgets
+- **Device Management**: Full CRUD operations for network devices
+- **Device Groups**: Organize devices into logical groups (Office, Home, Guests, IoT, etc.)
+- **Network Settings**: Simulated WiFi, DHCP, DNS, and LAN configuration
+- **Alerts System**: Real-time network alerts with severity levels
+- **Traffic Analytics**: Historical traffic logs with Chart.js visualization
+- **Search & Filtering**: Advanced device search with multiple filter options
+- **Role-Based Access Control**: Administrator and Technician user roles
 
----
+### User Management
+- **Complete Authentication Flow**: Registration, login, logout, password reset
+- **Profile Management**: Update profile information and avatar
+- **User Roles**: 
+  - **Network Administrator**: Full access to all features
+  - **Network Technician**: Read-only access with limited device management
 
-## Table of contents
+### Technical Features
+- **Progressive Web App (PWA)**: Installable with offline support
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Modern UI**: Built with Tailwind CSS v4 and DaisyUI
+- **Real-time Updates**: HTMX for dynamic content loading
+- **Interactive Components**: Alpine.js for client-side interactivity
+- **Data Visualization**: Chart.js for traffic analytics and network statistics
 
-- [Local development](#local-development)
-  - [Prerequisites](#prerequisites)
-  - [1. Bootstrap](#1-bootstrap-make-init)
-  - [2. Admin user](#2-admin-user-automatic)
-  - [3. Run the app (two processes)](#3-run-the-app-two-processes)
-  - [4. Open it](#4-open-it)
-- [Everyday commands](#everyday-commands)
-- [Database](#database)
-- [Front end](#front-end)
-- [Generating the API client](#generating-the-api-client)
-- [Celery & background tasks](#celery--background-tasks)
-- [Testing](#testing)
-- [Code quality & git hooks](#code-quality--git-hooks)
-- [Configuration](#configuration)
-- [Production](#production)
+## Technology Stack
 
----
+### Backend
+- **Django 6.0+**: Python web framework
+- **django-allauth**: Authentication system
+- **Django Rest Framework**: API framework
+- **Celery**: Background tasks and scheduled jobs
+- **PostgreSQL**: Production database (SQLite for development)
 
-## Local development
+### Frontend
+- **Tailwind CSS v4**: Utility-first CSS framework
+- **DaisyUI**: Component library for Tailwind
+- **Alpine.js**: Lightweight JavaScript framework
+- **HTMX**: Enhanced HTML for dynamic interactions
+- **Chart.js**: Data visualization library
+- **Vite**: Frontend build tool and dev server
 
-Local development runs **natively** on your Python environment (managed with
-[uv](https://docs.astral.sh/uv/)) against a **SQLite** database. No Docker, Postgres, or Redis
-required.
+### Development Tools
+- **uv**: Python package manager
+- **npm**: JavaScript package manager
+- **ruff**: Python linting and formatting
+- **mypy**: Static type checking
+- **Docker**: Containerization for production
+
+## Installation
 
 ### Prerequisites
 
 Install these once on your machine:
 
-- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** — manages the virtual environment
-  and provisions Python 3.14 for you (you do **not** need to install Python 3.14 separately):
+- **[uv](https://docs.astral.sh/uv/getting-started/installation/)** — Python package manager
   ```bash
-  curl -LsSf https://astral.sh/uv/install.sh | sh   # or: brew install uv
+  curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
-- **[Node.js](https://nodejs.org/) 20+** — provides `node` and `npm` for the front-end build.
-- **`make`** — preinstalled on macOS/Linux. On Windows,
-  [follow these instructions](https://stackoverflow.com/a/57042516/8207).
+- **[Node.js](https://nodejs.org/) 20+** — JavaScript runtime
+- **`make`** — Build automation tool (preinstalled on macOS/Linux)
 
-### 1. Bootstrap (`make init`)
+### First-time Setup
 
 From the project root:
 
@@ -62,292 +77,328 @@ make init
 ```
 
 This single command:
+1. Copies `.env.example` → `.env` (if it doesn't exist)
+2. Installs Python dependencies with `uv sync`
+3. Installs front-end dependencies with `npm install`
+4. Creates the SQLite database and applies migrations
+5. Sets up Django groups for user roles
 
-1. Copies `.env.example` → `.env` (only if `.env` doesn't already exist).
-2. Installs Python dependencies into a local `.venv` with `uv sync`.
-3. Installs front-end dependencies with `npm install`.
-4. Creates the SQLite database (`db.sqlite3`) and applies all migrations.
+### Database Setup
 
-### 2. Admin user (automatic)
+The project uses **SQLite** for local development (no setup required). For production, configure PostgreSQL via the `DATABASE_URL` environment variable.
 
-In `DEBUG`, `make start` (i.e. `runserver`) **automatically creates a development superuser** the
-first time it runs, then silently skips it afterwards. Defaults:
+### Running the Application
 
-| Field    | Value               |
-|----------|---------------------|
-| Email    | `admin@example.com` |
-| Password | `admin`             |
-
-Override via `DEV_SUPERUSER_EMAIL` / `DEV_SUPERUSER_PASSWORD` in `.env`. This only happens when
-`DEBUG` is true, so production is never affected. You can still create more accounts with
-`make manage ARGS='createsuperuser'`.
-
-### 3. Run the app (two processes)
-
-Local development needs **two terminals running simultaneously** — the Django server *and* the Vite
-front-end server. In `DEBUG`, CSS/JS are served by Vite, so **if you skip the second process the page
-loads unstyled.**
+Local development needs **two terminals running simultaneously**:
 
 **Terminal 1 — Django backend (port 8000):**
-
 ```bash
 make start
 ```
 
-**Terminal 2 — Vite front end (port 5173):**
-
+**Terminal 2 — Vite front-end server (port 5173):**
 ```bash
 make npm-dev
 ```
 
-### 4. Open it
+Visit **[http://localhost:8000](http://localhost:8000/)** to access the application.
 
-Visit **[http://localhost:8000](http://localhost:8000/)** — you should see a fully styled page. The
-Django admin is at [http://localhost:8000/admin/](http://localhost:8000/admin/) (log in with the
-auto-created dev superuser from step 2).
+> **Note**: The Vite dev server is required for styling. Without it, pages will load unstyled.
 
-> **Styles not loading?** It almost always means the Vite dev server (step 3, Terminal 2) isn't
-> running, or `node_modules` is missing. Run `make npm-install` then `make npm-dev` and refresh.
+## Initial Setup
 
-New to Pegasus? [Try these next steps](https://docs.saaspegasus.com/getting-started/#post-installation-steps).
+### 1. Create User Roles
 
----
-
-## Everyday commands
-
-Run `make` with no arguments to list every available target. Local targets (`start`, `migrate`,
-`test`, `shell`, …) run natively via `uv`; production targets are prefixed with `prod-` and use Docker.
-
-| Command | What it does |
-|---------|--------------|
-| `make start` | Run the Django dev server |
-| `make shell` | Open a Django Python shell |
-| `make dbshell` | Open a database shell (SQLite locally) |
-| `make manage ARGS='<cmd>'` | Run any `manage.py` command, e.g. `ARGS='createsuperuser'` |
-| `make migrations` | Create new migrations |
-| `make migrate` | Apply migrations |
-| `make test` | Run the test suite |
-| `make ruff` | Format **and** lint Python with Ruff |
-| `make npm-dev` | Run the Vite dev server |
-| `make npm-build` | Build production front-end assets |
-
-Management commands can also be run directly: `uv run python manage.py <command>`.
-
----
-
-## Database
-
-Local development uses **SQLite** by default — no setup required. Leaving `DATABASE_URL` unset makes
-Django use the `db.sqlite3` file in the project root.
+Set up the administrator and technician groups with appropriate permissions:
 
 ```bash
-make migrations   # uv run python manage.py makemigrations
-make migrate      # uv run python manage.py migrate
+make manage ARGS='setup_roles'
 ```
 
-In production, set `DATABASE_URL` (e.g. a Postgres connection string) in the environment — it takes
-precedence over SQLite automatically.
+### 2. Generate Sample Data
 
----
-
-## Front end
-
-JavaScript/TypeScript lives in `assets/` and is bundled by [Vite](https://vitejs.dev/) and served
-through [`django-vite`](https://github.com/MrBin99/django-vite). Tailwind v4 + DaisyUI provide styling.
+Populate the dashboard with realistic demo data:
 
 ```bash
-make npm-install            # install all npm packages
-make npm-install <package>  # install a specific package
-make npm-dev                # Vite dev server with hot reload (local development)
-make npm-build              # build optimized assets (production)
-make npm-type-check         # TypeScript type checking
+make manage ARGS='generate_sample_data'
 ```
 
-In `DEBUG`, `DJANGO_VITE["default"]["dev_mode"]` is `True`, so assets are served live from the Vite
-dev server. With `DEBUG=False`, Django serves the built manifest from `npm-build` instead.
+This creates:
+- 6 device groups (Office, Home, Guests, Security, IoT, Gaming)
+- 50 network devices with realistic data
+- Traffic logs for the past 7 days
+- 30 network alerts
+- Network settings configuration
 
----
+### 3. Create User Accounts
 
-## Generating the API client
+1. Sign up at [http://localhost:8000/accounts/signup/](http://localhost:8000/accounts/signup/)
+2. Log in with your credentials
+3. The first user is automatically assigned the Technician role
+4. Use Django admin to assign Administrator role: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-The REST API (Django Rest Framework) publishes an OpenAPI schema via `drf-spectacular` at
-`/api/schema/`. The TypeScript client in `api-client/` is **generated from that schema** and consumed
-by the front end (see `assets/javascript/api.js`). It is generated code — don't edit it by hand.
+### 4. Assign User Roles (Optional)
 
-Whenever you add or change API endpoints, regenerate the client:
+To assign a user to a specific role, use the Django shell:
 
 ```bash
-make generate-api-client
+make shell
 ```
 
-This target:
+```python
+from django.contrib.auth.models import User, Group
 
-1. Exports the OpenAPI schema from Django (`manage.py spectacular`).
-2. Runs [OpenAPI Generator](https://openapi-generator.tech) (`typescript-fetch`), pinned to the
-   version in `OPENAPI_GENERATOR_VERSION` (kept in sync with `api-client/.openapi-generator/VERSION`),
-   via `npx @openapitools/openapi-generator-cli`.
-3. Writes the result into `api-client/` and cleans up the temporary schema file.
+# Get user and group
+user = User.objects.get(email="user@example.com")
+admin_group = Group.objects.get(name="Administrators")
 
-**Requirements:** `node`/`npx` and a Java runtime (the generator runs on the JVM). Review the diff
-before committing.
+# Add user to group
+user.groups.add(admin_group)
+```
 
----
+## User Roles and Permissions
 
-## Celery & background tasks
+### Network Administrator
+Full access to all features:
+- ✅ View and edit all devices
+- ✅ Create, update, delete devices
+- ✅ Connect, disconnect, block devices
+- ✅ Configure network settings
+- ✅ Manage device groups
+- ✅ View and manage alerts
+- ✅ Manage users and permissions
 
-Celery runs background and scheduled tasks. **Locally, tasks run eagerly (synchronously)** by default
-(`CELERY_TASK_ALWAYS_EAGER` defaults to `DEBUG`), so **no broker is required**.
+### Network Technician
+Limited access for monitoring and basic operations:
+- ✅ View all devices and analytics
+- ✅ Edit device names
+- ✅ View network settings (read-only)
+- ✅ View and acknowledge alerts
+- ✅ View device groups
+- ❌ Cannot change global network settings
+- ❌ Cannot manage users
+- ❌ Cannot delete devices
 
-To exercise the real worker locally, run a Redis instance, set `REDIS_URL` in `.env`, then:
+## Project Structure
 
+```
+django-starter/
+├── apps/
+│   ├── network/          # NetVista main application
+│   │   ├── models.py     # Device, Alert, TrafficLog models
+│   │   ├── views.py      # Dashboard, device management views
+│   │   ├── forms.py      # Django forms
+│   │   ├── admin.py      # Django admin configuration
+│   │   ├── urls.py       # URL routing
+│   │   ├── decorators.py # Role-based access control
+│   │   └── management/   # Django management commands
+│   ├── users/            # User authentication and profiles
+│   ├── utils/            # Shared utilities and base models
+│   └── web/              # Landing pages and base templates
+├── config/               # Django settings
+│   ├── settings/
+│   │   ├── base.py       # Shared settings
+│   │   ├── dev.py        # Development settings
+│   │   └── prod.py       # Production settings
+│   ├── urls.py           # Main URL configuration
+│   └── wsgi.py           # WSGI configuration
+├── templates/            # Django templates
+│   ├── network/          # NetVista-specific templates
+│   └── web/              # Base templates and components
+├── static/               # Static files
+│   ├── manifest.json     # PWA manifest
+│   ├── service-worker.js # Service worker for offline support
+│   └── images/           # Images and icons
+├── assets/               # Frontend source files
+│   ├── javascript/       # JavaScript source
+│   └── styles/           # CSS source
+└── requirements.txt     # Python dependencies
+```
+
+## Common Commands
+
+### Development
 ```bash
-make celery
-# or directly:
-uv run celery -A config worker -l INFO --beat --pool=solo
+make start                # Run Django dev server
+make npm-dev              # Run Vite dev server
+make shell                # Open Django shell
+make dbshell              # Open database shell
+make migrate              # Apply database migrations
+make migrations           # Create new migrations
+make test                 # Run tests
+make ruff                 # Format and lint Python code
 ```
 
-> The `solo` pool is fine for development but **not** for production.
+### Database
+```bash
+make migrations           # Create migrations
+make migrate              # Apply migrations
+make dbshell              # Open database shell
+```
 
-In production (`DEBUG=False`) tasks dispatch to the Redis broker and are processed by the dedicated
-`celery` container (see [Production](#production)).
+### Frontend
+```bash
+make npm-dev              # Run Vite dev server
+make npm-build            # Build for production
+make npm-install          # Install npm packages
+```
 
----
+### NetVista Specific
+```bash
+make manage ARGS='setup_roles'         # Set up user roles and permissions
+make manage ARGS='generate_sample_data' # Generate sample data
+```
+
+## PWA Features
+
+NetVista includes Progressive Web App functionality:
+
+### Installation
+- The app can be installed on desktop and mobile devices
+- Supports "Add to Home Screen" on iOS and Android
+- Provides app-like experience with dedicated icon
+
+### Offline Support
+- Service worker caches static assets
+- Offline page displays when network is unavailable
+- Core functionality remains accessible without internet
+
+### PWA Configuration
+- **Manifest**: `/static/manifest.json`
+- **Service Worker**: `/static/service-worker.js`
+- **Offline Page**: `/network/offline/`
+
+## Deployment
+
+### Production Setup
+
+1. **Configure Environment Variables**
+   ```bash
+   cp .env.prod.example .env.prod
+   # Edit .env.prod with your production values
+   ```
+
+2. **Build Production Image**
+   ```bash
+   make prod-build
+   ```
+
+3. **Start Production Stack**
+   ```bash
+   make prod-start      # Foreground
+   make prod-start-bg   # Background
+   ```
+
+4. **Stop Production Stack**
+   ```bash
+   make prod-stop
+   ```
+
+### Production Architecture
+
+The production stack uses Docker Compose with:
+- **PostgreSQL 17**: Database
+- **Redis 7**: Cache and Celery broker
+- **Gunicorn**: WSGI HTTP server
+- **Celery**: Background task processing
+- **WhiteNoise**: Static file serving
+
+### Hosting Platforms
+
+NetVista is compatible with free hosting platforms:
+- **Render**: Full-stack deployment
+- **Fly.io**: Container deployment
+- **Railway**: Container deployment
+- **Heroku**: Container deployment (with add-ons)
+
+## Environment Variables
+
+### Required for Production
+- `SECRET_KEY`: Django secret key
+- `DATABASE_URL`: PostgreSQL connection string
+- `REDIS_URL`: Redis connection string
+- `ALLOWED_HOSTS`: Comma-separated list of allowed hosts
+
+### Optional
+- `DEBUG`: Enable/disable debug mode
+- `EMAIL_BACKEND`: Email configuration
+- `GOOGLE_ANALYTICS_ID`: Google Analytics tracking ID
 
 ## Testing
 
-```bash
-make test                                              # run everything
-make test ARGS='apps.web.tests.test_basic_views'       # a single module
-make test ARGS='apps.web.tests.test_basic_views --keepdb'  # reuse the test DB (faster)
-```
-
-On Linux you can re-run tests on change:
+Run the test suite:
 
 ```bash
-find . -name '*.py' | entr uv run python manage.py test apps.web.tests.test_basic_views
+make test                              # Run all tests
+make test ARGS='apps.network.tests'    # Run specific app tests
+make test ARGS='--keepdb'              # Reuse test database (faster)
 ```
+
+## Code Quality
+
+Maintain code quality with automated tools:
+
+```bash
+make ruff                 # Format and lint Python code
+make ruff-format          # Format code only
+make ruff-lint            # Lint code only
+```
+
+## Troubleshooting
+
+### Styles Not Loading
+- Ensure Vite dev server is running: `make npm-dev`
+- Check that `node_modules` exists: `make npm-install`
+- Verify browser console for errors
+
+### Database Locked
+- Close any database connections
+- Restart the Django server
+- If persistent, delete `db.sqlite3` and run `make init`
+
+### Permission Denied Errors
+- Verify user role assignment
+- Check group permissions in Django admin
+- Ensure `setup_roles` command was run
+
+## Security Notes
+
+- NetVista is a **simulation only** - it does not interact with real networks
+- All data is stored locally in the database
+- No external network scanning or control is performed
+- User authentication follows Django security best practices
+- Production deployment requires proper SSL/TLS configuration
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Code Style**: Follow PEP 8 with 120 character line limit
+2. **Testing**: Write tests for new features
+3. **Documentation**: Update documentation for changes
+4. **Commit Messages**: Use clear, descriptive commit messages
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Built with [Django](https://www.djangoproject.com/)
+- UI components from [DaisyUI](https://daisyui.com/)
+- Authentication powered by [django-allauth](https://django-allauth.readthedocs.io/)
+- Icons from [Font Awesome](https://fontawesome.com/)
+- Charts powered by [Chart.js](https://www.chartjs.org/)
+
+## Support
+
+For issues, questions, or contributions:
+- Create an issue on GitHub
+- Check existing documentation
+- Review Django and framework documentation
 
 ---
 
-## Code quality & git hooks
+**NetVista** - Modern Network Management Dashboard Simulator
 
-```bash
-make ruff           # ruff format + lint --fix
-make ruff-format    # format only
-make ruff-lint      # lint + autofix only
-make type-check     # mypy
-```
-
-Install the pre-commit hooks (run automatically on every commit):
-
-```bash
-uv run pre-commit install --install-hooks
-```
-
-See the [Pegasus code-formatting docs](https://docs.saaspegasus.com/code-structure#code-formatting)
-for details.
-
----
-
-## Configuration
-
-Configuration is read from environment variables (via `.env` locally). `make init` /
-`make setup-env` copy `.env.example` → `.env` for you. The most important variables:
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `SECRET_KEY` | insecure dev key | Django secret key. **Set a strong value in production.** |
-| `DEBUG` | `True` | Debug mode. **Must be `False` in production** (or use `config.settings.prod`). |
-| `ALLOWED_HOSTS` | `*` | Comma-separated allowed hosts. Restrict in production. |
-| `DATABASE_URL` | *(unset → SQLite)* | Postgres connection string in production. |
-| `REDIS_URL` | *(unset → `redis://localhost:6379/0`)* | Cache + Celery broker. Required in production. |
-| `CELERY_TASK_ALWAYS_EAGER` | `= DEBUG` | Run tasks synchronously when true. |
-| `DEV_SUPERUSER_EMAIL` / `DEV_SUPERUSER_PASSWORD` | `admin@example.com` / `admin` | Auto-created dev superuser (DEBUG only). |
-| `ENABLE_DEBUG_TOOLBAR` | `False`¹ | Django Debug Toolbar (disabled during tests). |
-| `EMAIL_BACKEND` | console backend | Email backend; configure a real one (e.g. Mailgun/Anymail) in production. |
-| `DJANGO_PORT` / `DJANGO_VITE_PORT` | `8000` / `5173` | Dev server ports. |
-| `POSTGRES_PORT` / `REDIS_PORT` | `5432` / `6379` | Docker service ports. |
-| `TURNSTILE_KEY` / `TURNSTILE_SECRET` | *(empty)* | Cloudflare Turnstile keys (optional). |
-| `GOOGLE_ANALYTICS_ID` | *(empty)* | GA measurement ID (optional). |
-
-¹ `.env.example` ships with `ENABLE_DEBUG_TOOLBAR=True` for convenience.
-
-> Never commit `.env` — it's git-ignored. See `.env.example` for the full, annotated list.
-
-**Settings modules:** live in the `config/settings/` package.
-
-- `config.settings.base` — shared settings imported by both environment modules. Not selected directly.
-- `config.settings.dev` — the default, used everywhere unless overridden. `DEBUG` defaults to `True`.
-- `config.settings.prod` — imports everything from `base`, then forces `DEBUG=False`
-  and enables the security hardening (SSL redirect, secure cookies, HSTS scaffolding, etc.). Select it
-  in production via `DJANGO_SETTINGS_MODULE=config.settings.prod`.
-
----
-
-## Production
-
-Docker Compose runs a production-ready stack — **Postgres, Redis, a gunicorn web server, and a
-Celery worker (with beat)**. The web and Celery services share one image built from `Dockerfile`
-(a multi-stage build that compiles the front-end assets with Vite, then installs the production
-Python dependencies) and run with `DJANGO_SETTINGS_MODULE=config.settings.prod`.
-
-**Requirements:** [Docker](https://www.docker.com/get-started) and
-[Docker Compose](https://docs.docker.com/compose/install).
-
-### 1. Configure secrets
-
-```bash
-make setup-env-prod    # copies .env.prod.example -> .env.prod (git-ignored)
-```
-
-Edit `.env.prod` and set real values — at minimum `SECRET_KEY`, `ALLOWED_HOSTS`,
-`POSTGRES_PASSWORD` / `DATABASE_URL`, and `REDIS_URL`. `DEBUG=False` is required (see the notes in
-the file). For real email, configure `EMAIL_BACKEND` and its credentials (e.g. Mailgun via Anymail).
-
-### 2. Build and run
-
-```bash
-make prod-build                    # build the production image
-make prod-start                    # start the stack (foreground)
-make prod-start-bg                 # start the stack (background)
-make prod-stop                     # stop the stack
-make prod-restart                  # stop + start
-make prod-ssh                      # shell into the running web container
-make prod-manage ARGS='migrate'    # run a manage.py command in the web container
-```
-
-On startup the `web` service **applies migrations and runs `collectstatic` automatically**, then
-serves the app with gunicorn on port `8000`. Static files are served directly by the app via
-[WhiteNoise](https://whitenoise.readthedocs.io/) — no separate web server is required (put a
-TLS-terminating reverse proxy in front for HTTPS; the production settings honour the
-`X-Forwarded-Proto` header).
-
-### What the stack contains
-
-`docker-compose.yml` defines four services:
-
-| Service | Image / build | Role |
-|---------|---------------|------|
-| `db` | `postgres:17` | Postgres database (persisted in the `postgres_data` volume) |
-| `redis` | `redis:7` | Cache + Celery broker (persisted in `redis_data`) |
-| `web` | `Dockerfile` | Django app under gunicorn on port `8000` (runs migrate + collectstatic on boot) |
-| `celery` | `Dockerfile` | Celery worker + beat |
-
-Uploaded media persists in the `media_files` volume. `MY_UID` / `MY_GID` (in the `Makefile`) set the
-container user/group so files created in mounted volumes belong to your host user rather than `root`.
-The defaults (`1000`) suit most setups.
-
-### Before going live
-
-Validate the deployment settings:
-
-```bash
-make prod-manage ARGS='check --deploy'
-```
-
-Consider also enabling HSTS (see the commented block in `config/settings/prod.py`) once you're
-confident HTTPS works, and scaling `GUNICORN_WORKERS` in `.env.prod` to `(2 × CPU cores) + 1`.
-
----
-
-*Built with [SaaS Pegasus](https://www.saaspegasus.com/), the Django SaaS boilerplate.*
+*Built for demonstration and educational purposes only.*

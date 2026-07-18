@@ -1,0 +1,198 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">{{ device.name }}</h1>
+      <p class="text-base-content/60">{{ device.get_device_type_display }}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'network:device_update' device.id %}" class="btn btn-primary">
+        <i class="fa fa-edit"></i>
+        {% trans "Edit" %}
+      </a>
+      {% if device.status == 'online' %}
+      <a href="{% url 'network:device_disconnect' device.id %}" class="btn btn-warning">
+        <i class="fa fa-plug"></i>
+        {% trans "Disconnect" %}
+      </a>
+      <a href="{% url 'network:device_block' device.id %}" class="btn btn-error">
+        <i class="fa fa-ban"></i>
+        {% trans "Block" %}
+      </a>
+      {% elif device.status == 'blocked' %}
+      <a href="{% url 'network:device_unblock' device.id %}" class="btn btn-success">
+        <i class="fa fa-check"></i>
+        {% trans "Unblock" %}
+      </a>
+      {% endif %}
+      <a href="{% url 'network:device_list' %}" class="btn btn-ghost">
+        {% trans "Back to List" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Device Status Card -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title">
+        <i class="fa fa-info-circle text-info"></i>
+        {% trans "Device Information" %}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "Status" %}</div>
+          <div class="text-lg font-bold">
+            {% if device.status == 'online' %}
+            <span class="text-success">{% trans "Online" %}</span>
+            {% elif device.status == 'offline' %}
+            <span class="text-warning">{% trans "Offline" %}</span>
+            {% else %}
+            <span class="text-error">{% trans "Blocked" %}</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "IP Address" %}</div>
+          <div class="text-lg font-bold font-mono">{{ device.ip_address }}</div>
+        </div>
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "MAC Address" %}</div>
+          <div class="text-lg font-bold font-mono">{{ device.mac_address }}</div>
+        </div>
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "Manufacturer" %}</div>
+          <div class="text-lg font-bold">{{ device.manufacturer|default:"-" }}</div>
+        </div>
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "Connected Since" %}</div>
+          <div class="text-lg font-bold">{{ device.connected_since|date:"M d, Y H:i" }}</div>
+        </div>
+        <div class="p-4 bg-base-100 rounded">
+          <div class="text-sm text-base-content/60">{% trans "Last Seen" %}</div>
+          <div class="text-lg font-bold">{{ device.last_seen|timesince }} ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Speed Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-download text-success"></i>
+          {% trans "Download Speed" %}
+        </h2>
+        <div class="text-4xl font-bold text-success">{{ device.download_speed|floatformat:1 }} Mbps</div>
+        <div class="w-full bg-base-300 rounded-full h-4">
+          <div class="bg-success h-4 rounded-full" style="width: {% widthratio device.download_speed 1000 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-upload text-info"></i>
+          {% trans "Upload Speed" %}
+        </h2>
+        <div class="text-4xl font-bold text-info">{{ device.upload_speed|floatformat:1 }} Mbps</div>
+        <div class="w-full bg-base-300 rounded-full h-4">
+          <div class="bg-info h-4 rounded-full" style="width: {% widthratio device.upload_speed 1000 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signal Strength -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title">
+        <i class="fa fa-signal text-warning"></i>
+        {% trans "Signal Strength" %}
+      </h2>
+      <div class="text-4xl font-bold text-warning">{{ device.signal_strength }} dBm</div>
+      <div class="w-full bg-base-300 rounded-full h-4">
+        <div class="bg-warning h-4 rounded-full" style="width: {% widthratio device.signal_strength|add:100 100 100 %}%"></div>
+      </div>
+      <div class="text-sm text-base-content/60 mt-2">
+        {% if device.signal_strength > -50 %}
+        {% trans "Excellent signal" %}
+        {% elif device.signal_strength > -60 %}
+        {% trans "Good signal" %}
+        {% elif device.signal_strength > -70 %}
+        {% trans "Fair signal" %}
+        {% else %}
+        {% trans "Poor signal" %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Info -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title">
+        <i class="fa fa-cog text-secondary"></i>
+        {% trans "Additional Information" %}
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-sm text-base-content/60">{% trans "Owner" %}</div>
+          <div class="font-bold">{{ device.owner.get_full_name|default:"-" }}</div>
+        </div>
+        <div>
+          <div class="text-sm text-base-content/60">{% trans "Group" %}</div>
+          <div class="font-bold">{{ device.group.name|default:"-" }}</div>
+        </div>
+        <div class="md:col-span-2">
+          <div class="text-sm text-base-content/60">{% trans "Notes" %}</div>
+          <div class="font-bold">{{ device.notes|default:"-" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traffic History -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <h2 class="card-title">
+        <i class="fa fa-chart-line text-primary"></i>
+        {% trans "Traffic History" %}
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>{% trans "Timestamp" %}</th>
+              <th>{% trans "Download" %}</th>
+              <th>{% trans "Upload" %}</th>
+              <th>{% trans "Total" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in traffic_logs %}
+            <tr>
+              <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+              <td>{{ log.download_bytes|filesizeformat }}</td>
+              <td>{{ log.upload_bytes|filesizeformat }}</td>
+              <td>{{ log.download_bytes|add:log.upload_bytes|filesizeformat }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center py-4">
+                {% trans "No traffic data available" %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -28,6 +28,9 @@ def get_image_url(project_meta, page_image=None):
     # local media urls become absolute; anything else is treated as a static path
     if image.startswith(settings.MEDIA_URL):
         return meta.absolute_url(image)
+    # if the path already starts with /static/, use it directly to avoid double-prefixing
+    if image.startswith(settings.STATIC_URL):
+        return meta.absolute_url(image)
     return meta.absolute_url(static(image))
 
 

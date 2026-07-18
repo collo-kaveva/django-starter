@@ -73,6 +73,7 @@ THIRD_PARTY_APPS = [
 PROJECT_APPS = [
     "apps.users.apps.UserConfig",
     "apps.web",
+    "apps.network.apps.NetworkConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
@@ -385,18 +386,18 @@ SCHEDULED_TASKS: dict[str, Any] = {
 
 # replace any values below with specifics for your project
 PROJECT_METADATA = {
-    "NAME": gettext_lazy("django-template"),
+    "NAME": gettext_lazy("NetVista"),
     "URL": "http://localhost:8000",
-    "DESCRIPTION": gettext_lazy("my django template"),  # noqa: E501
-    "IMAGE": "https://upload.wikimedia.org/wikipedia/commons/2/20/PEO-pegasus_black.svg",
-    "KEYWORDS": "SaaS, django",
-    "CONTACT_EMAIL": "achinga.chris@gmail.com",
+    "DESCRIPTION": gettext_lazy("Modern Network Management Dashboard Simulator"),  # noqa: E501
+    "IMAGE": "images/icons/icon-192x192.png",
+    "KEYWORDS": "network management, dashboard, monitoring, simulation",
+    "CONTACT_EMAIL": "admin@netvista.local",
 }
 
 # set this to True in production to have URLs generated with https instead of http
 USE_HTTPS_IN_ABSOLUTE_URLS = env.bool("USE_HTTPS_IN_ABSOLUTE_URLS", default=False)
 
-ADMINS = ["achinga.chris@gmail.com"]
+ADMINS = ["admin@netvista.local"]
 
 # Add your google analytics ID to the environment to connect to Google Analytics
 GOOGLE_ANALYTICS_ID = env("GOOGLE_ANALYTICS_ID", default="")

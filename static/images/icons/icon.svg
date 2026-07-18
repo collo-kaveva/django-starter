@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#3B82F6" rx="100"/>
+  <g fill="white">
+    <!-- Router icon -->
+    <rect x="120" y="280" width="272" height="120" rx="20"/>
+    <circle cx="160" cy="340" r="15"/>
+    <circle cx="200" cy="340" r="15"/>
+    <circle cx="240" cy="340" r="15"/>
+    <circle cx="280" cy="340" r="15"/>
+    <circle cx="320" cy="340" r="15"/>
+    <circle cx="360" cy="340" r="15"/>
+    <!-- WiFi signal -->
+    <path d="M256 120 L256 240"/>
+    <path d="M256 120 Q220 160 220 200 L256 200 Q256 160 256 120" transform="rotate(-45 256 280)"/>
+    <path d="M256 120 Q220 160 220 200 L256 200 Q256 160 256 120" transform="rotate(45 256 280)"/>
+    <circle cx="256" cy="180" r="20"/>
+  </g>
+</svg>

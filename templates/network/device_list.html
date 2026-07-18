@@ -1,0 +1,253 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">{% trans "Devices" %}</h1>
+      <p class="text-base-content/60">{% trans "Manage network devices" %}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'network:device_create' %}" class="btn btn-primary">
+        <i class="fa fa-plus"></i>
+        {% trans "Add Device" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <form method="get" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Search -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">{% trans "Search" %}</span>
+            </label>
+            <input type="text" name="search" value="{{ search_query }}" 
+                   class="input input-bordered" placeholder="{% trans 'Name, MAC, IP...' %}">
+          </div>
+
+          <!-- Status Filter -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">{% trans "Status" %}</span>
+            </label>
+            <select name="status" class="select select-bordered">
+              <option value="">{% trans "All Status" %}</option>
+              {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Group Filter -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">{% trans "Group" %}</span>
+            </label>
+            <select name="group" class="select select-bordered">
+              <option value="">{% trans "All Groups" %}</option>
+              {% for group in device_groups %}
+              <option value="{{ group.id }}" {% if group_filter == group.id|stringformat:"s" %}selected{% endif %}>
+                {{ group.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Type Filter -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">{% trans "Device Type" %}</span>
+            </label>
+            <select name="type" class="select select-bordered">
+              <option value="">{% trans "All Types" %}</option>
+              {% for value, label in device_types %}
+              <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>
+                {{ label }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <!-- Sort -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">{% trans "Sort by" %}</span>
+            </label>
+            <select name="sort" class="select select-bordered w-auto">
+              <option value="-last_seen" {% if sort_by == '-last_seen' %}selected{% endif %}>
+                {% trans "Last Seen (Newest)" %}
+              </option>
+              <option value="last_seen" {% if sort_by == 'last_seen' %}selected{% endif %}>
+                {% trans "Last Seen (Oldest)" %}
+              </option>
+              <option value="name" {% if sort_by == 'name' %}selected{% endif %}>
+                {% trans "Name (A-Z)" %}
+              </option>
+              <option value="-name" {% if sort_by == '-name' %}selected{% endif %}>
+                {% trans "Name (Z-A)" %}
+              </option>
+              <option value="-download_speed" {% if sort_by == '-download_speed' %}selected{% endif %}>
+                {% trans "Download Speed (High-Low)" %}
+              </option>
+              <option value="download_speed" {% if sort_by == 'download_speed' %}selected{% endif %}>
+                {% trans "Download Speed (Low-High)" %}
+              </option>
+            </select>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fa fa-search"></i>
+              {% trans "Filter" %}
+            </button>
+            <a href="{% url 'network:device_list' %}" class="btn btn-ghost">
+              {% trans "Clear" %}
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Devices Table -->
+  <div class="overflow-x-auto">
+    <table class="table table-zebra">
+      <thead>
+        <tr>
+          <th>{% trans "Name" %}</th>
+          <th>{% trans "Type" %}</th>
+          <th>{% trans "IP Address" %}</th>
+          <th>{% trans "MAC Address" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Download" %}</th>
+          <th>{% trans "Upload" %}</th>
+          <th>{% trans "Last Seen" %}</th>
+          <th>{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for device in devices %}
+        <tr>
+          <td>
+            <div class="flex items-center gap-2">
+              <i class="fa fa-laptop text-base-content/60"></i>
+              <span class="font-medium">{{ device.name }}</span>
+            </div>
+          </td>
+          <td>{{ device.get_device_type_display }}</td>
+          <td class="font-mono text-sm">{{ device.ip_address }}</td>
+          <td class="font-mono text-sm">{{ device.mac_address }}</td>
+          <td>
+            {% if device.status == 'online' %}
+            <span class="badge badge-success badge-sm">{% trans "Online" %}</span>
+            {% elif device.status == 'offline' %}
+            <span class="badge badge-warning badge-sm">{% trans "Offline" %}</span>
+            {% else %}
+            <span class="badge badge-error badge-sm">{% trans "Blocked" %}</span>
+            {% endif %}
+          </td>
+          <td>{{ device.download_speed|floatformat:1 }} Mbps</td>
+          <td>{{ device.upload_speed|floatformat:1 }} Mbps</td>
+          <td class="text-sm">{{ device.last_seen|timesince }} ago</td>
+          <td>
+            <div class="dropdown dropdown-end">
+              <label tabindex="0" class="btn btn-ghost btn-sm">
+                <i class="fa fa-ellipsis-v"></i>
+              </label>
+              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                  <a href="{% url 'network:device_detail' device.id %}">
+                    <i class="fa fa-eye"></i>
+                    {% trans "View Details" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'network:device_update' device.id %}">
+                    <i class="fa fa-edit"></i>
+                    {% trans "Edit" %}
+                  </a>
+                </li>
+                {% if device.status == 'online' %}
+                <li>
+                  <a href="{% url 'network:device_disconnect' device.id %}">
+                    <i class="fa fa-plug"></i>
+                    {% trans "Disconnect" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'network:device_block' device.id %}">
+                    <i class="fa fa-ban"></i>
+                    {% trans "Block" %}
+                  </a>
+                </li>
+                {% elif device.status == 'blocked' %}
+                <li>
+                  <a href="{% url 'network:device_unblock' device.id %}">
+                    <i class="fa fa-check"></i>
+                    {% trans "Unblock" %}
+                  </a>
+                </li>
+                {% endif %}
+                <li>
+                  <a href="{% url 'network:device_delete' device.id %}" class="text-error">
+                    <i class="fa fa-trash"></i>
+                    {% trans "Delete" %}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center py-8">
+            <div class="text-base-content/60">
+              <i class="fa fa-laptop text-4xl mb-2"></i>
+              <p>{% trans "No devices found" %}</p>
+              <a href="{% url 'network:device_create' %}" class="btn btn-primary btn-sm mt-2">
+                {% trans "Add your first device" %}
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="flex justify-center">
+    <div class="join">
+      {% if page_obj.has_previous %}
+      <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+         class="join-item btn">«</a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+         class="join-item btn">‹</a>
+      {% endif %}
+
+      <span class="join-item btn btn-disabled">
+        {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+         class="join-item btn">›</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if group_filter %}&group={{ group_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+         class="join-item btn">»</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

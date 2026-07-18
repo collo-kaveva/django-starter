@@ -1,9 +1,12 @@
 {% load i18n %}
 <footer class="p-6 mt-16 border-t footer footer-center border-base-300 text-base-content/60">
   <div x-data>
-    <p>{{ project_meta.NAME }} &mdash; {% translate "Copyright" %} <span x-text="new Date().getFullYear()">2024</span></p>
+    <p>{{ project_meta.NAME }} &mdash; {% translate "Modern Network Management Dashboard Simulator" %}</p>
     <p class="text-sm">
-      {% blocktranslate trimmed %}adapted from 🦄 Built with <a class="link link-hover" href="https://www.saaspegasus.com/" target="_blank">SaaS Pegasus</a> by chris achinga{% endblocktranslate %}
+      {% translate "Copyright" %} <span x-text="new Date().getFullYear()">2024</span>
+    </p>
+    <p class="text-sm">
+      {% blocktranslate trimmed %}Built with <a class="link link-hover" href="https://www.djangoproject.com/" target="_blank">Django</a>, <a class="link link-hover" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>, and <a class="link link-hover" href="https://daisyui.com/" target="_blank">DaisyUI</a>{% endblocktranslate %}
     </p>
   </div>
 </footer>

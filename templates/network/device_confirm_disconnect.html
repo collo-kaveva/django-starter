@@ -1,0 +1,59 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div>
+    <h1 class="text-3xl font-bold">{% trans "Disconnect Device" %}</h1>
+    <p class="text-base-content/60">{% trans "Are you sure you want to disconnect this device?" %}</p>
+  </div>
+
+  <!-- Confirmation Card -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <div class="alert alert-info">
+        <i class="fa fa-info-circle"></i>
+        <div>
+          <h3 class="font-bold">{% trans "Disconnect" %}</h3>
+          <div class="text-sm">{% trans "The device will be marked as offline but can reconnect later." %}</div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto mt-4">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td class="font-bold">{% trans "Name" %}</td>
+              <td>{{ device.name }}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">{% trans "Type" %}</td>
+              <td>{{ device.get_device_type_display }}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">{% trans "IP Address" %}</td>
+              <td>{{ device.ip_address }}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">{% trans "Current Status" %}</td>
+              <td>{{ device.get_status_display }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <form method="post" class="flex justify-end gap-2 mt-4">
+        {% csrf_token %}
+        <a href="{% url 'network:device_detail' device.id %}" class="btn btn-ghost">
+          {% trans "Cancel" %}
+        </a>
+        <button type="submit" class="btn btn-warning">
+          <i class="fa fa-plug"></i>
+          {% trans "Disconnect Device" %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">{% trans "Device Groups" %}</h1>
+      <p class="text-base-content/60">{% trans "Organize devices into groups" %}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'network:device_group_create' %}" class="btn btn-primary">
+        <i class="fa fa-plus"></i>
+        {% trans "Add Group" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Groups Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for group in groups %}
+    <div class="card bg-base-200 hover:shadow-lg transition">
+      <div class="card-body">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background-color: {{ group.color }}20;">
+              <i class="fa fa-folder text-xl" style="color: {{ group.color }};"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg">{{ group.name }}</h3>
+              <div class="text-sm text-base-content/60">{{ group.device_count }} devices</div>
+            </div>
+          </div>
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-sm">
+              <i class="fa fa-ellipsis-v"></i>
+            </label>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li>
+                <a href="{% url 'network:device_group_update' group.id %}">
+                  <i class="fa fa-edit"></i>
+                  {% trans "Edit" %}
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'network:device_group_delete' group.id %}" class="text-error">
+                  <i class="fa fa-trash"></i>
+                  {% trans "Delete" %}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        {% if group.description %}
+        <p class="text-sm text-base-content/80 mt-2">{{ group.description }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12 bg-base-200 rounded-lg">
+      <i class="fa fa-folder-open text-4xl text-base-content/40 mb-4"></i>
+      <p class="text-base-content/60">{% trans "No device groups created" %}</p>
+      <a href="{% url 'network:device_group_create' %}" class="btn btn-primary btn-sm mt-2">
+        {% trans "Create your first group" %}
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

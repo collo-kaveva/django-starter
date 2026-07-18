@@ -1,0 +1,281 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">{% trans "Dashboard" %}</h1>
+      <p class="text-base-content/60">{% trans "Network overview and real-time statistics" %}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'network:device_create' %}" class="btn btn-primary">
+        <i class="fa fa-plus"></i>
+        {% trans "Add Device" %}
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Internet Status -->
+    <div class="stat bg-base-200 rounded-lg">
+      <div class="stat-figure text-primary">
+        <i class="fa fa-globe text-3xl"></i>
+      </div>
+      <div class="stat-title">{% trans "Internet Status" %}</div>
+      <div class="stat-value text-primary text-2xl">{% trans "Online" %}</div>
+      <div class="stat-desc">{% trans "Connection stable" %}</div>
+    </div>
+
+    <!-- Connected Devices -->
+    <div class="stat bg-base-200 rounded-lg">
+      <div class="stat-figure text-success">
+        <i class="fa fa-wifi text-3xl"></i>
+      </div>
+      <div class="stat-title">{% trans "Connected Devices" %}</div>
+      <div class="stat-value text-success text-2xl">{{ online_devices }}</div>
+      <div class="stat-desc">{% trans "Currently online" %}</div>
+    </div>
+
+    <!-- Offline Devices -->
+    <div class="stat bg-base-200 rounded-lg">
+      <div class="stat-figure text-warning">
+        <i class="fa fa-plug text-3xl"></i>
+      </div>
+      <div class="stat-title">{% trans "Offline Devices" %}</div>
+      <div class="stat-value text-warning text-2xl">{{ offline_devices }}</div>
+      <div class="stat-desc">{% trans "Disconnected" %}</div>
+    </div>
+
+    <!-- Blocked Devices -->
+    <div class="stat bg-base-200 rounded-lg">
+      <div class="stat-figure text-error">
+        <i class="fa fa-ban text-3xl"></i>
+      </div>
+      <div class="stat-title">{% trans "Blocked Devices" %}</div>
+      <div class="stat-value text-error text-2xl">{{ blocked_devices }}</div>
+      <div class="stat-desc">{% trans "Access denied" %}</div>
+    </div>
+  </div>
+
+  <!-- Speed Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-upload text-info"></i>
+          {% trans "Upload Speed" %}
+        </h2>
+        <div class="text-4xl font-bold text-info">{{ avg_upload|floatformat:1 }} Mbps</div>
+        <div class="w-full bg-base-300 rounded-full h-4">
+          <div class="bg-info h-4 rounded-full" style="width: {% widthratio avg_upload 1000 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-download text-success"></i>
+          {% trans "Download Speed" %}
+        </h2>
+        <div class="text-4xl font-bold text-success">{{ avg_download|floatformat:1 }} Mbps</div>
+        <div class="w-full bg-base-300 rounded-full h-4">
+          <div class="bg-success h-4 rounded-full" style="width: {% widthratio avg_download 1000 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-chart-line text-primary"></i>
+          {% trans "Traffic Overview" %}
+        </h2>
+        <div class="h-64">
+          <canvas id="trafficChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <h2 class="card-title">
+          <i class="fa fa-chart-pie text-secondary"></i>
+          {% trans "Device Distribution" %}
+        </h2>
+        <div class="h-64">
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Alerts and Top Consumers -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Recent Alerts -->
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-title">
+            <i class="fa fa-bell text-warning"></i>
+            {% trans "Recent Alerts" %}
+          </h2>
+          <a href="{% url 'network:alert_list' %}" class="btn btn-sm btn-ghost">
+            {% trans "View All" %}
+          </a>
+        </div>
+        <div class="space-y-2">
+          {% for alert in recent_alerts %}
+          <div class="alert alert-{{ alert.severity }} alert-sm">
+            <div>
+              <h3 class="font-bold">{{ alert.title }}</h3>
+              <div class="text-xs">{{ alert.created_at|timesince }} ago</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-base-content/60 py-4">
+            {% trans "No recent alerts" %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Bandwidth Consumers -->
+    <div class="card bg-base-200">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-title">
+            <i class="fa fa-trophy text-accent"></i>
+            {% trans "Top Bandwidth Consumers" %}
+          </h2>
+          <a href="{% url 'network:device_list' %}" class="btn btn-sm btn-ghost">
+            {% trans "View All" %}
+          </a>
+        </div>
+        <div class="space-y-2">
+          {% for device in top_consumers %}
+          <div class="flex items-center justify-between p-2 bg-base-100 rounded">
+            <div class="flex items-center gap-2">
+              <i class="fa fa-laptop text-base-content/60"></i>
+              <span class="font-medium">{{ device.name }}</span>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-bold text-success">{{ device.download_speed|floatformat:1 }} Mbps</div>
+              <div class="text-xs text-base-content/60">{% trans "Download" %}</div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center text-base-content/60 py-4">
+            {% trans "No devices online" %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Groups -->
+  <div class="card bg-base-200">
+    <div class="card-body">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="card-title">
+          <i class="fa fa-layer-group text-info"></i>
+          {% trans "Device Groups" %}
+        </h2>
+        <a href="{% url 'network:device_group_list' %}" class="btn btn-sm btn-ghost">
+          {% trans "Manage Groups" %}
+        </a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {% for group in device_groups %}
+        <div class="text-center p-4 bg-base-100 rounded-lg cursor-pointer hover:bg-base-200 transition">
+          <div class="w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center" style="background-color: {{ group.color }}20;">
+            <i class="fa fa-folder text-xl" style="color: {{ group.color }};"></i>
+          </div>
+          <div class="font-medium">{{ group.name }}</div>
+          <div class="text-sm text-base-content/60">{{ group.device_count }} devices</div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center text-base-content/60 py-4">
+          {% trans "No device groups created" %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Traffic Chart
+  const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+  const trafficChart = new Chart(trafficCtx, {
+    type: 'line',
+    data: {
+      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+      datasets: [{
+        label: '{% trans "Upload" %}',
+        data: [5, 8, 15, 25, 20, 12, 8],
+        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        fill: true
+      }, {
+        label: '{% trans "Download" %}',
+        data: [15, 25, 45, 80, 65, 35, 20],
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Device Distribution Chart
+  const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+  const deviceChart = new Chart(deviceCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['{% trans "Online" %}', '{% trans "Offline" %}', '{% trans "Blocked" %}'],
+      datasets: [{
+        data: [{{ online_devices }}, {{ offline_devices }}, {{ blocked_devices }}],
+        backgroundColor: [
+          'rgb(34, 197, 94)',
+          'rgb(234, 179, 8)',
+          'rgb(239, 68, 68)'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -19,7 +19,13 @@ class CustomUser(AbstractUser):
     Add additional fields to the user model here.
     """
 
+    class Role(models.TextChoices):
+        ADMINISTRATOR = "administrator", "Network Administrator"
+        TECHNICIAN = "technician", "Network Technician"
+
     avatar = models.FileField(upload_to=_get_avatar_filename, blank=True, validators=[validate_profile_picture])
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.TECHNICIAN)
+    bio = models.TextField(blank=True, help_text="Optional bio information")
 
     def __str__(self):
         return f"{self.get_full_name()} <{self.email or self.username}>"

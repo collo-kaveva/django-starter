@@ -49,7 +49,7 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ("email", "first_name", "last_name")
+        fields = ("email", "first_name", "last_name", "role", "bio")
 
 
 class UploadAvatarForm(forms.Form):
