@@ -79,6 +79,30 @@
 {% block page_js %}
 {% endblock page_js %}
 
+<!-- Theme Toggle Script -->
+<script>
+  (function() {
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme) {
+      html.setAttribute('data-theme', savedTheme);
+    } else if (prefersDark) {
+      html.setAttribute('data-theme', 'dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+    }
+    
+    window.toggleTheme = function() {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    };
+  })();
+</script>
+
 <!-- Service Worker Registration -->
 <script>
   if ('serviceWorker' in navigator) {

@@ -3,28 +3,55 @@
 {% load static %}
 {% load form_tags %}
 {% block body %}
-  <div class="flex justify-center my-8">
-    <div class="w-96 max-w-full px-4 py-4 card bg-base-100 border border-base-300">
-      <div class="card-body">
-        <h2 class="text-center text-2xl font-bold">
-          {% translate "Sign In" %}
-        </h2>
-        <form class="mt-6 space-y-6" method="post">
-          {% csrf_token %}
-          {{ form.non_field_errors }}
-          {% render_field form.login %}
-          {% render_field form.password %}
-          <div>
-            <input class="btn btn-primary btn-block" type="submit" value="{% translate "Sign In" %}">
+  <div class="flex justify-center items-center min-h-screen">
+    <div class="w-full max-w-md px-4">
+      <div class="card bg-base-200 shadow-xl border border-base-300">
+        <div class="card-body">
+          <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-primary">NetVista</h2>
+            <p class="text-base-content/70 mt-2">Network Management Dashboard</p>
           </div>
-        </form>
-        {% if LOGIN_BY_CODE_ENABLED %}
-        <p class="pg-text-centered pg-text-muted">
-          <a class="text-sm muted-link" href="{{ request_login_code_url }}">
-            {% translate "Mail me a sign-in code" %}
-          </a>
-        </p>
-        {% endif %}
+          
+          <h3 class="text-xl font-semibold text-center mb-6">
+            {% translate "Sign In" %}
+          </h3>
+          
+          <form class="space-y-4" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% render_field form.login %}
+            {% render_field form.password %}
+            <div class="flex justify-between items-center mt-2">
+              <label class="label cursor-pointer gap-2">
+                <input type="checkbox" name="remember" class="checkbox checkbox-primary checkbox-sm" />
+                <span class="label-text text-sm">{% translate "Remember me" %}</span>
+              </label>
+            </div>
+            <div class="mt-6">
+              <input class="btn btn-primary btn-block" type="submit" value="{% translate "Sign In" %}">
+            </div>
+          </form>
+          
+          <div class="divider text-sm text-base-content/50 my-6">OR</div>
+          
+          <div class="text-center space-y-2">
+            <a href="{% url 'account_reset_password' %}" class="link link-primary link-hover text-sm">
+              {% translate "Forgot your password?" %}
+            </a>
+            <br>
+            <a href="{% url 'account_signup' %}" class="link link-neutral link-hover text-sm">
+              {% translate "Don't have an account? Sign up" %}
+            </a>
+          </div>
+          
+          {% if LOGIN_BY_CODE_ENABLED %}
+          <div class="mt-4 text-center">
+            <a class="text-sm text-base-content/70 hover:text-primary" href="{{ request_login_code_url }}">
+              {% translate "Mail me a sign-in code" %}
+            </a>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>

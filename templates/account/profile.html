@@ -24,9 +24,15 @@
       // https://stackoverflow.com/a/4459419/8207
       let reader = new FileReader();
       reader.onload = function (e) {
-        let avatars = document.getElementsByClassName('avatar');
+        // Update all avatar images on the page
+        let avatars = document.querySelectorAll('img[src*="avatar"], img[src*="gravatar"], .avatar');
         for (let i = 0; i < avatars.length; i++) {
           avatars[i].setAttribute('src', e.target.result);
+        }
+        // Also update images in the top nav
+        let topNavAvatars = document.querySelectorAll('.rounded-full.object-cover');
+        for (let i = 0; i < topNavAvatars.length; i++) {
+          topNavAvatars[i].setAttribute('src', e.target.result);
         }
       };
       reader.readAsDataURL(file);
@@ -65,6 +71,10 @@
               uploadlabel.innerHTML = '<span class="w-6 h-6 inline-flex justify-center items-center"><i class="fa fa-check"></i></span><span>' + text + '</span>';
               uploadlabel.classList.remove('is-active');
               uploadlabel.classList.add('text-success');
+              // Reload page after successful upload to update all avatars with the new URL
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
             });
           } else {
             // the server returns JSON validation errors, but a 403/500 is an HTML page that

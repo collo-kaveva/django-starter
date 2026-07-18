@@ -300,12 +300,19 @@ FORMS_URLFIELD_ASSUME_HTTPS = True
 # Email setup
 
 # default email used by your server
-SERVER_EMAIL = env("SERVER_EMAIL", default="noreply@localhost:8000")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="achinga.chris@gmail.com")
+SERVER_EMAIL = env("SERVER_EMAIL", default="noreply@netvista.local")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@netvista.local")
 
 # The default value will print emails to the console, but you can change that here
 # and in your environment.
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+
+# SMTP configuration for password reset emails
+EMAIL_HOST = env("EMAIL_HOST", default=None)
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default=None)
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
 
 # Most production backends will require further customization. The below example uses Mailgun.
 # ANYMAIL = {
@@ -317,7 +324,7 @@ EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.
 # see https://github.com/anymail/django-anymail for more details/examples
 # EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-EMAIL_SUBJECT_PREFIX = "[django-template] "
+EMAIL_SUBJECT_PREFIX = "[NetVista] "
 
 # Django sites
 

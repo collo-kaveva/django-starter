@@ -82,6 +82,7 @@ This single command:
 3. Installs front-end dependencies with `npm install`
 4. Creates the SQLite database and applies migrations
 5. Sets up Django groups for user roles
+6. Creates demo accounts for development
 
 ### Database Setup
 
@@ -130,14 +131,40 @@ This creates:
 - 30 network alerts
 - Network settings configuration
 
-### 3. Create User Accounts
+### 3. Demo Accounts
+
+Demo accounts are automatically created during `make init` for development and testing purposes:
+
+**Administrator**
+- Username: `admin`
+- Email: `admin@netvista.local`
+- Password: `Admin123!`
+- Role: Network Administrator (full access to all features)
+
+**Standard User**
+- Username: `user`
+- Email: `user@netvista.local`
+- Password: `User123!`
+- Role: Network Technician (read-only access with limited device management)
+
+> **Note**: These accounts are automatically created during project setup and are intended for local development and demo purposes only.
+
+To recreate demo accounts at any time, run:
+
+```bash
+make manage ARGS='create_demo_accounts'
+```
+
+### 4. Create Additional User Accounts (Optional)
+
+To create additional user accounts manually:
 
 1. Sign up at [http://localhost:8000/accounts/signup/](http://localhost:8000/accounts/signup/)
 2. Log in with your credentials
 3. The first user is automatically assigned the Technician role
 4. Use Django admin to assign Administrator role: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-### 4. Assign User Roles (Optional)
+### 5. Assign User Roles (Optional)
 
 To assign a user to a specific role, use the Django shell:
 
@@ -323,6 +350,69 @@ NetVista is compatible with free hosting platforms:
 - `DEBUG`: Enable/disable debug mode
 - `EMAIL_BACKEND`: Email configuration
 - `GOOGLE_ANALYTICS_ID`: Google Analytics tracking ID
+
+## Email Configuration for Password Reset
+
+NetVista uses Django's built-in email framework for password reset functionality. To enable password reset emails, configure the following environment variables in your `.env` file:
+
+### Basic Email Settings
+
+```bash
+# Default sender email address
+DEFAULT_FROM_EMAIL="noreply@netvista.local"
+SERVER_EMAIL="noreply@netvista.local"
+
+# Email backend
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+```
+
+### SMTP Configuration
+
+**For Gmail:**
+```bash
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER="your-email@gmail.com"
+EMAIL_HOST_PASSWORD="your-app-password"
+```
+
+**For SendGrid:**
+```bash
+EMAIL_HOST="smtp.sendgrid.net"
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER="apikey"
+EMAIL_HOST_PASSWORD="SG.your-sendgrid-api-key"
+```
+
+**For Resend:**
+```bash
+EMAIL_HOST="smtp.resend.com"
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER="resend"
+EMAIL_HOST_PASSWORD="your-resend-api-key"
+```
+
+### Development Mode
+
+For local development without a real email server, use the console backend (default):
+
+```bash
+EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend"
+```
+
+This will print emails to the console instead of sending them.
+
+### Testing Password Reset
+
+1. Configure email settings in `.env`
+2. Restart the Django server
+3. Go to the login page: [http://localhost:8000/accounts/login/](http://localhost:8000/accounts/login/)
+4. Click "Forgot your password?"
+5. Enter your email address
+6. Check your email (or console if using console backend) for the reset link
 
 ## Testing
 
