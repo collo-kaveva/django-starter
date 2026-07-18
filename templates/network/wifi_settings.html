@@ -1,0 +1,130 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white">{% trans "WiFi Settings" %}</h1>
+      <p class="text-base-content/60 text-lg">{% trans "Configure wireless network settings" %}</p>
+    </div>
+  </div>
+
+  <!-- WiFi Configuration -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-electric/10">
+          <i class="fa fa-wifi text-electric text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Network Configuration" %}</h3>
+      </div>
+      
+      <form class="space-y-4">
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Network Name (SSID)" %}</label>
+          <input type="text" value="NetVista-Network" class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+        </div>
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Password" %}</label>
+          <input type="password" value="********" class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+        </div>
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Security Mode" %}</label>
+          <select class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+            <option>WPA3-Personal</option>
+            <option>WPA2-Personal</option>
+            <option>WPA/WPA2</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Frequency Band" %}</label>
+          <select class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+            <option>Dual Band (2.4GHz & 5GHz)</option>
+            <option>5GHz Only</option>
+            <option>2.4GHz Only</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-electric to-indigo text-white font-semibold hover:shadow-lg hover:shadow-electric/30 transition-all duration-300">
+          {% trans "Save Changes" %}
+        </button>
+      </form>
+    </div>
+
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-purple/10">
+          <i class="fa fa-broadcast-tower text-purple text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Advanced Settings" %}</h3>
+      </div>
+      
+      <form class="space-y-4">
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Channel" %}</label>
+          <select class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+            <option>Auto</option>
+            <option>Channel 1</option>
+            <option>Channel 6</option>
+            <option>Channel 11</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-base-content/60 mb-2">{% trans "Transmission Power" %}</label>
+          <select class="w-full px-4 py-3 rounded-xl bg-navy-light/30 border border-white/10 text-white focus:outline-none focus:border-electric/50 transition-colors">
+            <option>100%</option>
+            <option>75%</option>
+            <option>50%</option>
+            <option>25%</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">{% trans "Guest Network" %}</div>
+            <div class="text-xs text-base-content/40">{% trans "Separate network for guests" %}</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-navy-light peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric"></div>
+          </label>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div>
+            <div class="text-sm font-medium text-white">{% trans "Isolate Clients" %}</div>
+            <div class="text-xs text-base-content/40">{% trans "Prevent client-to-client communication" %}</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-navy-light peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric"></div>
+          </label>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Connected Devices -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 rounded-xl bg-emerald/10">
+        <i class="fa fa-users text-emerald text-xl"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">{% trans "Connected Devices" %}</h3>
+      <span class="px-3 py-1 rounded-full bg-emerald/20 text-emerald text-sm">{{ devices|length }}</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {% for device in devices|slice:":8" %}
+      <div class="flex items-center gap-3 p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 transition-all duration-300">
+        <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+          <i class="fa fa-laptop text-base-content/70"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-medium text-white truncate">{{ device.name }}</div>
+          <div class="text-xs text-base-content/40">{{ device.ip_address }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

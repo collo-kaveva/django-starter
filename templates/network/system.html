@@ -1,0 +1,212 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white">{% trans "System" %}</h1>
+      <p class="text-base-content/60 text-lg">{% trans "System information and settings" %}</p>
+    </div>
+    <button class="px-6 py-3 rounded-xl bg-gradient-to-r from-electric to-indigo text-white font-semibold hover:shadow-lg hover:shadow-electric/30 transition-all duration-300 hover:-translate-y-0.5">
+      <i class="fa fa-sync mr-2"></i>
+      {% trans "Restart System" %}
+    </button>
+  </div>
+
+  <!-- System Status -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-emerald/10">
+          <i class="fa fa-server text-emerald text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Uptime" %}</h3>
+      </div>
+      <p class="text-2xl font-bold text-white">20 Days</p>
+      <p class="text-xs text-base-content/40 mt-1">Since Jun 28, 2026</p>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-electric/10">
+          <i class="fa fa-microchip text-electric text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "CPU Load" %}</h3>
+      </div>
+      <p class="text-2xl font-bold text-white">32%</p>
+      <div class="w-full bg-navy-light rounded-full h-2 mt-2">
+        <div class="bg-electric h-2 rounded-full" style="width: 32%"></div>
+      </div>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-indigo/10">
+          <i class="fa fa-memory text-indigo text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Memory" %}</h3>
+      </div>
+      <p class="text-2xl font-bold text-white">64%</p>
+      <div class="w-full bg-navy-light rounded-full h-2 mt-2">
+        <div class="bg-indigo h-2 rounded-full" style="width: 64%"></div>
+      </div>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-purple/10">
+          <i class="fa fa-hdd text-purple text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Storage" %}</h3>
+      </div>
+      <p class="text-2xl font-bold text-white">45%</p>
+      <div class="w-full bg-navy-light rounded-full h-2 mt-2">
+        <div class="bg-purple h-2 rounded-full" style="width: 45%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Information -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-electric/10">
+          <i class="fa fa-info-circle text-electric text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "System Information" %}</h3>
+      </div>
+      
+      <div class="space-y-4">
+        <div class="flex justify-between items-center p-3 rounded-xl bg-navy-light/30 border border-white/5">
+          <span class="text-sm text-base-content/60">{% trans "Hostname" %}</span>
+          <span class="text-sm font-medium text-white">netvista-router</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-navy-light/30 border border-white/5">
+          <span class="text-sm text-base-content/60">{% trans "Model" %}</span>
+          <span class="text-sm font-medium text-white">NetVista Pro X1</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-navy-light/30 border border-white/5">
+          <span class="text-sm text-base-content/60">{% trans "Firmware Version" %}</span>
+          <span class="text-sm font-medium text-white">2.4.1</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-navy-light/30 border border-white/5">
+          <span class="text-sm text-base-content/60">{% trans "Kernel Version" %}</span>
+          <span class="text-sm font-medium text-white">5.15.0</span>
+        </div>
+        <div class="flex justify-between items-center p-3 rounded-xl bg-navy-light/30 border border-white/5">
+          <span class="text-sm text-base-content/60">{% trans "Serial Number" %}</span>
+          <span class="text-sm font-medium text-white font-mono">NV-2024-001234</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-emerald/10">
+          <i class="fa fa-network-wired text-emerald text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Network Interfaces" %}</h3>
+      </div>
+      
+      <div class="space-y-3">
+        <div class="p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald"></div>
+              <span class="text-sm font-medium text-white">eth0 (WAN)</span>
+            </div>
+            <span class="text-xs text-base-content/40">Connected</span>
+          </div>
+          <div class="text-xs text-base-content/40 font-mono">192.168.1.1/24</div>
+        </div>
+        <div class="p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald"></div>
+              <span class="text-sm font-medium text-white">eth1 (LAN)</span>
+            </div>
+            <span class="text-xs text-base-content/40">Connected</span>
+          </div>
+          <div class="text-xs text-base-content/40 font-mono">10.0.0.1/24</div>
+        </div>
+        <div class="p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 rounded-full bg-emerald"></div>
+              <span class="text-sm font-medium text-white">wlan0 (WiFi)</span>
+            </div>
+            <span class="text-xs text-base-content/40">Connected</span>
+          </div>
+          <div class="text-xs text-base-content/40 font-mono">10.0.0.1/24</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Actions -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 rounded-xl bg-orange/10">
+        <i class="fa fa-cogs text-orange text-xl"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">{% trans "System Actions" %}</h3>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <button class="p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 hover:bg-navy-light/50 transition-all duration-300 text-left">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="fa fa-sync text-electric"></i>
+          <span class="font-medium text-white">{% trans "Reboot" %}</span>
+        </div>
+        <p class="text-xs text-base-content/40">{% trans "Restart the system" %}</p>
+      </button>
+      <button class="p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 hover:bg-navy-light/50 transition-all duration-300 text-left">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="fa fa-power-off text-rose"></i>
+          <span class="font-medium text-white">{% trans "Shutdown" %}</span>
+        </div>
+        <p class="text-xs text-base-content/40">{% trans "Power off the system" %}</p>
+      </button>
+      <button class="p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 hover:bg-navy-light/50 transition-all duration-300 text-left">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="fa fa-download text-emerald"></i>
+          <span class="font-medium text-white">{% trans "Backup" %}</span>
+        </div>
+        <p class="text-xs text-base-content/40">{% trans "Create configuration backup" %}</p>
+      </button>
+      <button class="p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 hover:bg-navy-light/50 transition-all duration-300 text-left">
+        <div class="flex items-center gap-3 mb-2">
+          <i class="fa fa-upload text-indigo"></i>
+          <span class="font-medium text-white">{% trans "Restore" %}</span>
+        </div>
+        <p class="text-xs text-base-content/40">{% trans "Restore from backup" %}</p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Update Status -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="p-3 rounded-xl bg-purple/10">
+          <i class="fa fa-cloud-download-alt text-purple text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Software Updates" %}</h3>
+      </div>
+      <button class="px-4 py-2 rounded-xl bg-white/5 text-base-content/60 hover:bg-white/10 transition-colors">
+        {% trans "Check for Updates" %}
+      </button>
+    </div>
+    
+    <div class="flex items-center gap-4 p-4 rounded-xl bg-emerald/10 border border-emerald/20">
+      <div class="w-10 h-10 rounded-full bg-emerald/20 flex items-center justify-center">
+        <i class="fa fa-check text-emerald"></i>
+      </div>
+      <div class="flex-1">
+        <div class="text-sm font-medium text-white">{% trans "System is up to date" %}</div>
+        <div class="text-xs text-base-content/40">Last checked: Today at 2:00 AM</div>
+      </div>
+      <span class="px-3 py-1 rounded-full bg-emerald/20 text-emerald text-xs font-semibold">v2.4.1</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

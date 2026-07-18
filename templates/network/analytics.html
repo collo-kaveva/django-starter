@@ -1,0 +1,160 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white">{% trans "Analytics" %}</h1>
+      <p class="text-base-content/60 text-lg">{% trans "Detailed network statistics and insights" %}</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="?range=24h" class="px-4 py-2 rounded-xl {% if time_range == '24h' %}bg-electric/20 text-electric border border-electric/30{% else %}bg-white/5 text-base-content/60 hover:bg-white/10{% endif %} transition-colors">24H</a>
+      <a href="?range=7d" class="px-4 py-2 rounded-xl {% if time_range == '7d' %}bg-electric/20 text-electric border border-electric/30{% else %}bg-white/5 text-base-content/60 hover:bg-white/10{% endif %} transition-colors">7D</a>
+      <a href="?range=30d" class="px-4 py-2 rounded-xl {% if time_range == '30d' %}bg-electric/20 text-electric border border-electric/30{% else %}bg-white/5 text-base-content/60 hover:bg-white/10{% endif %} transition-colors">30D</a>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-electric/10">
+          <i class="fa fa-arrow-down text-electric text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Total Download" %}</h3>
+      </div>
+      <p class="text-3xl font-bold text-white">{{ total_bandwidth.download|floatformat:0 }} GB</p>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-indigo/10">
+          <i class="fa fa-arrow-up text-indigo text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Total Upload" %}</h3>
+      </div>
+      <p class="text-3xl font-bold text-white">{{ total_bandwidth.upload|floatformat:0 }} GB</p>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-emerald/10">
+          <i class="fa fa-clock text-emerald text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Avg. Speed" %}</h3>
+      </div>
+      <p class="text-3xl font-bold text-white">{{ traffic_logs.count }} Mbps</p>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-3 rounded-xl bg-purple/10">
+          <i class="fa fa-chart-bar text-purple text-xl"></i>
+        </div>
+        <h3 class="text-base-content/60 text-sm">{% trans "Data Points" %}</h3>
+      </div>
+      <p class="text-3xl font-bold text-white">{{ traffic_logs.count }}</p>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-electric/10">
+          <i class="fa fa-chart-line text-electric text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Traffic Over Time" %}</h3>
+      </div>
+      <div class="h-64">
+        <canvas id="trafficTimeChart"></canvas>
+      </div>
+    </div>
+    <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-purple/10">
+          <i class="fa fa-chart-pie text-purple text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">{% trans "Device Type Distribution" %}</h3>
+      </div>
+      <div class="h-64">
+        <canvas id="deviceTypeChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Type Distribution -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 rounded-xl bg-purple/10">
+        <i class="fa fa-chart-pie text-purple text-xl"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">{% trans "Device Type Distribution" %}</h3>
+    </div>
+    <div class="h-64">
+      <canvas id="deviceTypeChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  Chart.defaults.color = '#9CA3AF';
+  Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+  // Traffic Over Time Chart
+  const trafficTimeCtx = document.getElementById('trafficTimeChart').getContext('2d');
+  new Chart(trafficTimeCtx, {
+    type: 'line',
+    data: {
+      labels: [{% for log in traffic_logs %}'{{ log.timestamp|date:"H:i" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+      datasets: [{
+        label: '{% trans "Download" %}',
+        data: [{% for log in traffic_logs %}{{ log.download_bytes|floatformat:0 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        borderColor: '#10B981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        tension: 0.4,
+        fill: true
+      }, {
+        label: '{% trans "Upload" %}',
+        data: [{% for log in traffic_logs %}{{ log.upload_bytes|floatformat:0 }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        borderColor: '#4F46E5',
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  // Device Type Chart
+  const deviceTypeCtx = document.getElementById('deviceTypeChart').getContext('2d');
+  new Chart(deviceTypeCtx, {
+    type: 'doughnut',
+    data: {
+      labels: [{% for dt in device_types %}'{{ dt.device_type }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+      datasets: [{
+        data: [{% for dt in device_types %}{{ dt.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+        borderWidth: 2,
+        borderColor: '#1A1F35'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '70%',
+      plugins: {
+        legend: { position: 'right' }
+      }
+    }
+  });
+</script>
+{% endblock %}

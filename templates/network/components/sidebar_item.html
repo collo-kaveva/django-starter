@@ -1,0 +1,15 @@
+{% load i18n %}
+<li>
+  <a href="{{ url }}" 
+     class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+            {% if active %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+    {% if active %}
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+    {% endif %}
+    <i class="fa fa-{{ icon }} text-lg {% if active %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+    <span class="font-medium">{{ title }}</span>
+    {% if badge %}
+    <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-rose/20 text-rose">{{ badge }}</span>
+    {% endif %}
+  </a>
+</li>

@@ -1,0 +1,102 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white">{% trans "Network Map" %}</h1>
+      <p class="text-base-content/60 text-lg">{% trans "Visual network topology" %}</p>
+    </div>
+    <div class="flex gap-2">
+      <button class="px-4 py-2 rounded-xl bg-white/5 text-base-content/60 hover:bg-white/10 transition-colors">
+        <i class="fa fa-expand mr-2"></i>{% trans "Fullscreen" %}
+      </button>
+      <button class="px-4 py-2 rounded-xl bg-white/5 text-base-content/60 hover:bg-white/10 transition-colors">
+        <i class="fa fa-download mr-2"></i>{% trans "Export" %}
+      </button>
+    </div>
+  </div>
+
+  <!-- Network Topology Visualization -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300" style="min-height: 600px;">
+    <svg class="w-full h-full" viewBox="0 0 800 600">
+      <!-- Connection Lines -->
+      <defs>
+        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.5" />
+          <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.5" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      
+      <!-- Router to Devices Lines -->
+      {% for device in devices|slice:":10" %}
+        <line x1="400" y1="300" 
+              x2="{{ forloop.counter0|add:100 }}" 
+              y2="100" 
+              stroke="url(#lineGradient)" 
+              stroke-width="2" 
+              filter="url(#glow)"
+              class="animate-pulse" />
+      {% endfor %}
+      
+      <!-- Central Router -->
+      <g class="cursor-pointer">
+        <circle cx="400" cy="300" r="40" fill="#1A1F35" stroke="#3B82F6" stroke-width="3" filter="url(#glow)" />
+        <circle cx="400" cy="300" r="30" fill="#3B82F6" opacity="0.2" class="animate-pulse" />
+        <text x="400" y="305" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Router</text>
+      </g>
+      
+      <!-- Device Nodes -->
+      {% for device in devices|slice:":10" %}
+        <g class="cursor-pointer" transform="translate({{ forloop.counter0|add:100 }}, 100)">
+          <circle r="25" fill="#1A1F35" stroke="{% if device.status == 'ONLINE' %}#10B981{% elif device.status == 'OFFLINE' %}#F59E0B{% else %}#EF4444{% endif %}" stroke-width="2" filter="url(#glow)" />
+          <circle r="18" fill="{% if device.status == 'ONLINE' %}#10B981{% elif device.status == 'OFFLINE' %}#F59E0B{% else %}#EF4444{% endif %}" opacity="0.2" class="animate-pulse" />
+          <text y="5" text-anchor="middle" fill="white" font-size="10">{{ device.name|slice:":8" }}</text>
+        </g>
+      {% endfor %}
+      
+      <!-- Legend -->
+      <g transform="translate(50, 520)">
+        <rect width="200" height="60" rx="8" fill="#1A1F35" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+        <circle cx="20" cy="20" r="6" fill="#10B981" />
+        <text x="35" y="24" fill="#9CA3AF" font-size="12">{% trans "Online" %}</text>
+        <circle cx="20" cy="40" r="6" fill="#F59E0B" />
+        <text x="35" y="44" fill="#9CA3AF" font-size="12">{% trans "Offline" %}</text>
+        <circle cx="120" cy="20" r="6" fill="#EF4444" />
+        <text x="135" y="24" fill="#9CA3AF" font-size="12">{% trans "Blocked" %}</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Device List -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 rounded-xl bg-electric/10">
+        <i class="fa fa-list text-electric text-xl"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">{% trans "Connected Devices" %}</h3>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for device in devices|slice:":12" %}
+      <div class="flex items-center gap-3 p-3 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 transition-all duration-300 cursor-pointer">
+        <div class="w-3 h-3 rounded-full {% if device.status == 'ONLINE' %}bg-emerald{% elif device.status == 'OFFLINE' %}bg-orange{% else %}bg-rose{% endif %}"></div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-medium text-white truncate">{{ device.name }}</div>
+          <div class="text-xs text-base-content/40 font-mono">{{ device.ip_address }}</div>
+        </div>
+        <div class="text-xs text-base-content/40">{{ device.device_type }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

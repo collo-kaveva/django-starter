@@ -1,0 +1,141 @@
+{% extends "web/app/app_base.html" %}
+{% load i18n %}
+
+{% block app %}
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold text-white">{% trans "Speed Test" %}</h1>
+      <p class="text-base-content/60 text-lg">{% trans "Measure your network performance" %}</p>
+    </div>
+  </div>
+
+  <!-- Speed Test Card -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="text-center">
+      <div class="mb-8">
+        <div class="inline-flex items-center justify-center w-48 h-48 rounded-full bg-gradient-to-br from-electric/20 to-purple/20 border border-electric/30">
+          <div class="text-center">
+            <div id="speedValue" class="text-5xl font-bold text-white">0</div>
+            <div class="text-base-content/60 text-sm mt-2">Mbps</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-6 mb-8">
+        <div class="p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div class="flex items-center gap-3 mb-2">
+            <i class="fa fa-arrow-down text-emerald text-xl"></i>
+            <span class="text-base-content/60">{% trans "Download" %}</span>
+          </div>
+          <div id="downloadSpeed" class="text-2xl font-bold text-emerald">-- Mbps</div>
+        </div>
+        <div class="p-4 rounded-xl bg-navy-light/30 border border-white/5">
+          <div class="flex items-center gap-3 mb-2">
+            <i class="fa fa-arrow-up text-indigo text-xl"></i>
+            <span class="text-base-content/60">{% trans "Upload" %}</span>
+          </div>
+          <div id="uploadSpeed" class="text-2xl font-bold text-indigo">-- Mbps</div>
+        </div>
+      </div>
+      
+      <button id="startTest" onclick="runSpeedTest()" class="px-8 py-4 rounded-xl bg-gradient-to-r from-electric to-indigo text-white font-semibold hover:shadow-lg hover:shadow-electric/30 transition-all duration-300 hover:-translate-y-0.5">
+        <i class="fa fa-play mr-2"></i>
+        {% trans "Start Test" %}
+      </button>
+      
+      <div id="testProgress" class="hidden mt-6">
+        <div class="w-full bg-navy-light rounded-full h-2 mb-2">
+          <div id="progressBar" class="bg-gradient-to-r from-electric to-indigo h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <p id="testStatus" class="text-sm text-base-content/60">{% trans "Initializing..." %}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test History -->
+  <div class="relative bg-navy-light/50 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-electric/30 transition-all duration-300">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="p-3 rounded-xl bg-purple/10">
+        <i class="fa fa-history text-purple text-xl"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-white">{% trans "Recent Tests" %}</h3>
+    </div>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between p-4 rounded-xl bg-navy-light/30 border border-white/5">
+        <div class="flex items-center gap-4">
+          <div class="text-sm text-base-content/40">Today, 2:30 PM</div>
+          <div class="flex gap-6">
+            <span class="text-emerald"><i class="fa fa-arrow-down mr-1"></i> 845 Mbps</span>
+            <span class="text-indigo"><i class="fa fa-arrow-up mr-1"></i> 412 Mbps</span>
+          </div>
+        </div>
+        <span class="text-xs text-base-content/40">Ping: 12ms</span>
+      </div>
+      <div class="flex items-center justify-between p-4 rounded-xl bg-navy-light/30 border border-white/5">
+        <div class="flex items-center gap-4">
+          <div class="text-sm text-base-content/40">Yesterday, 8:15 AM</div>
+          <div class="flex gap-6">
+            <span class="text-emerald"><i class="fa fa-arrow-down mr-1"></i> 920 Mbps</span>
+            <span class="text-indigo"><i class="fa fa-arrow-up mr-1"></i> 450 Mbps</span>
+          </div>
+        </div>
+        <span class="text-xs text-base-content/40">Ping: 8ms</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function runSpeedTest() {
+  const button = document.getElementById('startTest');
+  const progress = document.getElementById('testProgress');
+  const progressBar = document.getElementById('progressBar');
+  const status = document.getElementById('testStatus');
+  const speedValue = document.getElementById('speedValue');
+  const downloadSpeed = document.getElementById('downloadSpeed');
+  const uploadSpeed = document.getElementById('uploadSpeed');
+  
+  button.disabled = true;
+  button.classList.add('opacity-50');
+  progress.classList.remove('hidden');
+  
+  let currentSpeed = 0;
+  const targetDownload = Math.floor(Math.random() * 200) + 700;
+  const targetUpload = Math.floor(Math.random() * 100) + 350;
+  
+  // Simulate download test
+  status.textContent = '{% trans "Testing download speed..." %}';
+  const downloadInterval = setInterval(() => {
+    currentSpeed += Math.random() * 50;
+    if (currentSpeed >= targetDownload) {
+      currentSpeed = targetDownload;
+      clearInterval(downloadInterval);
+      downloadSpeed.textContent = targetDownload + ' Mbps';
+      status.textContent = '{% trans "Testing upload speed..." %}';
+      
+      // Simulate upload test
+      let uploadCurrent = 0;
+      const uploadInterval = setInterval(() => {
+        uploadCurrent += Math.random() * 20;
+        progressBar.style.width = ((currentSpeed / targetDownload) * 50 + (uploadCurrent / targetUpload) * 50) + '%';
+        speedValue.textContent = Math.floor(uploadCurrent);
+        
+        if (uploadCurrent >= targetUpload) {
+          uploadCurrent = targetUpload;
+          clearInterval(uploadInterval);
+          uploadSpeed.textContent = targetUpload + ' Mbps';
+          status.textContent = '{% trans "Test complete!" %}';
+          button.disabled = false;
+          button.classList.remove('opacity-50');
+          button.innerHTML = '<i class="fa fa-redo mr-2"></i> {% trans "Run Again" %}';
+        }
+      }, 100);
+    }
+    progressBar.style.width = (currentSpeed / targetDownload) * 50 + '%';
+    speedValue.textContent = Math.floor(currentSpeed);
+  }, 100);
+}
+</script>
+{% endblock %}

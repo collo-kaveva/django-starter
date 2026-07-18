@@ -1,0 +1,203 @@
+{% load i18n %}
+<div class="w-64 h-screen sticky top-0 bg-navy-light/30 backdrop-blur-xl border-r border-white/10 flex flex-col">
+  <!-- Animated Logo -->
+  <div class="p-6 border-b border-white/10">
+    <div class="flex items-center gap-3">
+      <div class="relative w-12 h-12">
+        <svg class="w-12 h-12 animate-spin-slow" viewBox="0 0 48 48">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="24" r="20" fill="none" stroke="url(#logoGradient)" stroke-width="2" opacity="0.3" />
+          <circle cx="24" cy="24" r="16" fill="none" stroke="url(#logoGradient)" stroke-width="2" opacity="0.5" />
+          <circle cx="24" cy="24" r="12" fill="none" stroke="url(#logoGradient)" stroke-width="2" />
+          <!-- Orbiting nodes -->
+          <circle cx="24" cy="8" r="2" fill="#3B82F6" class="animate-pulse" />
+          <circle cx="40" cy="24" r="2" fill="#8B5CF6" class="animate-pulse" style="animation-delay: 0.5s" />
+          <circle cx="24" cy="40" r="2" fill="#3B82F6" class="animate-pulse" style="animation-delay: 1s" />
+          <circle cx="8" cy="24" r="2" fill="#8B5CF6" class="animate-pulse" style="animation-delay: 1.5s" />
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-lg font-bold text-white">N</span>
+        </div>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold text-white">NetVista</h1>
+        <p class="text-xs text-base-content/40">Network Dashboard</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex-1 overflow-y-auto p-4 space-y-6">
+    <!-- Main Navigation -->
+    <div>
+      <h3 class="px-4 mb-2 text-xs font-semibold text-base-content/40 uppercase tracking-wider">Navigation</h3>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'network:dashboard' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'dashboard' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'dashboard' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-tachometer-alt text-lg {% if active_tab == 'dashboard' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Dashboard" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:device_list' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'devices' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'devices' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-laptop text-lg {% if active_tab == 'devices' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Devices" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:alert_list' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'alerts' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'alerts' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-bell text-lg {% if active_tab == 'alerts' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Alerts" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:analytics' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'analytics' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'analytics' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-chart-line text-lg {% if active_tab == 'analytics' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Analytics" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:speed_test' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'speed_test' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'speed_test' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-tachometer text-lg {% if active_tab == 'speed_test' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Speed Test" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:network_map' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'network_map' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'network_map' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-project-diagram text-lg {% if active_tab == 'network_map' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Network Map" %}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Management -->
+    <div>
+      <h3 class="px-4 mb-2 text-xs font-semibold text-base-content/40 uppercase tracking-wider">Management</h3>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'network:network_settings' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'settings' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'settings' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-cog text-lg {% if active_tab == 'settings' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Settings" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:wifi_settings' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'wifi_settings' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'wifi_settings' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-wifi text-lg {% if active_tab == 'wifi_settings' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "WiFi Settings" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:firewall' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'firewall' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'firewall' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-shield-alt text-lg {% if active_tab == 'firewall' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Firewall" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'network:system' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'system' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'system' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-server text-lg {% if active_tab == 'system' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "System" %}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Account -->
+    <div>
+      <h3 class="px-4 mb-2 text-xs font-semibold text-base-content/40 uppercase tracking-wider">Account</h3>
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'users:user_profile' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group
+                    {% if active_tab == 'profile' %}bg-electric/20 text-electric border border-electric/30 shadow-lg shadow-electric/10{% else %}text-base-content/70 hover:bg-white/5 hover:text-white{% endif %}">
+            {% if active_tab == 'profile' %}
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-electric rounded-r-full animate-pulse"></div>
+            {% endif %}
+            <i class="fa fa-user text-lg {% if active_tab == 'profile' %}text-electric{% else %}text-base-content/50 group-hover:text-electric transition-colors{% endif %}"></i>
+            <span class="font-medium">{% trans "Profile" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'account_change_password' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-base-content/70 hover:bg-white/5 hover:text-white">
+            <i class="fa fa-unlock-alt text-lg text-base-content/50 group-hover:text-electric transition-colors"></i>
+            <span class="font-medium">{% trans "Change Password" %}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'account_logout' %}" 
+             class="relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-base-content/70 hover:bg-white/5 hover:text-white">
+            <i class="fa fa-sign-out text-lg text-base-content/50 group-hover:text-electric transition-colors"></i>
+            <span class="font-medium">{% trans "Logout" %}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- System Health Card -->
+  <div class="p-4 border-t border-white/10">
+    <div class="p-4 rounded-xl bg-gradient-to-br from-emerald/10 to-emerald/5 border border-emerald/20">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-2 h-2 rounded-full bg-emerald animate-pulse"></div>
+        <span class="text-sm font-semibold text-emerald">Excellent</span>
+      </div>
+      <p class="text-xs text-base-content/60">All systems operational</p>
+    </div>
+  </div>
+</div>

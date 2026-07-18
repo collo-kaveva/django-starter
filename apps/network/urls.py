@@ -33,6 +33,24 @@ urlpatterns = [
     path("groups/<int:group_id>/update/", views.device_group_update, name="device_group_update"),
     path("groups/<int:group_id>/delete/", views.device_group_delete, name="device_group_delete"),
     
+    # Analytics
+    path("analytics/", views.analytics, name="analytics"),
+    
+    # Speed Test
+    path("speed-test/", views.speed_test, name="speed_test"),
+    
+    # Network Map
+    path("network-map/", views.network_map, name="network_map"),
+    
+    # WiFi Settings
+    path("wifi-settings/", views.wifi_settings, name="wifi_settings"),
+    
+    # Firewall
+    path("firewall/", views.firewall, name="firewall"),
+    
+    # System
+    path("system/", views.system, name="system"),
+    
     # Offline page for PWA
     path("offline/", views.offline_page, name="offline"),
 ]

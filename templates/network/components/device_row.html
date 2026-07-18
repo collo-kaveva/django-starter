@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="flex items-center gap-4 p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-electric/30 transition-all duration-300 hover:bg-navy-light/50 group cursor-pointer">
+  <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-electric/10 transition-colors">
+    <i class="fa fa-{{ icon }} text-xl text-base-content/70 group-hover:text-electric transition-colors"></i>
+  </div>
+  <div class="flex-1 min-w-0">
+    <h4 class="font-semibold text-white text-sm truncate">{{ name }}</h4>
+    <p class="text-xs text-base-content/40 font-mono">{{ ip }}</p>
+  </div>
+  <div class="text-right flex-shrink-0">
+    <div class="text-sm font-bold text-emerald">{{ download }} Mbps</div>
+    <div class="text-xs text-base-content/40">Download</div>
+  </div>
+  <div class="w-24 flex-shrink-0">
+    <div class="h-2 bg-navy-light rounded-full overflow-hidden">
+      <div class="h-full bg-gradient-to-r from-emerald to-electric rounded-full transition-all duration-500" style="width: {{ progress }}%"></div>
+    </div>
+  </div>
+</div>

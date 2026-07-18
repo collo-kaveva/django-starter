@@ -435,3 +435,105 @@ def device_group_delete(request, group_id):
 def offline_page(request):
     """Offline page for PWA - doesn't require authentication."""
     return render(request, 'network/offline.html')
+
+
+@technician_or_administrator_required
+def analytics(request):
+    """Analytics page with detailed network statistics and charts."""
+    # Get traffic data for different time periods
+    time_range = request.GET.get('range', '24h')
+    
+    if time_range == '7d':
+        start_date = timezone.now() - timezone.timedelta(days=7)
+    elif time_range == '30d':
+        start_date = timezone.now() - timezone.timedelta(days=30)
+    else:
+        start_date = timezone.now() - timezone.timedelta(hours=24)
+    
+    traffic_logs = TrafficLog.objects.filter(timestamp__gte=start_date).order_by('timestamp')
+    
+    # Calculate statistics
+    total_bandwidth = traffic_logs.aggregate(
+        upload=Sum('upload_bytes'),
+        download=Sum('download_bytes')
+    )
+    
+    # Device type distribution
+    device_types = Device.objects.values('device_type').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    context = {
+        'active_tab': 'analytics',
+        'page_title': _('Analytics'),
+        'time_range': time_range,
+        'traffic_logs': traffic_logs,
+        'total_bandwidth': total_bandwidth,
+        'device_types': device_types,
+    }
+    
+    return render(request, 'network/analytics.html', context)
+
+
+@technician_or_administrator_required
+def speed_test(request):
+    """Speed test page to measure network performance."""
+    context = {
+        'active_tab': 'speed_test',
+        'page_title': _('Speed Test'),
+    }
+    
+    return render(request, 'network/speed_test.html', context)
+
+
+@technician_or_administrator_required
+def network_map(request):
+    """Network topology visualization page."""
+    devices = Device.objects.all()
+    
+    context = {
+        'active_tab': 'network_map',
+        'page_title': _('Network Map'),
+        'devices': devices,
+    }
+    
+    return render(request, 'network/network_map.html', context)
+
+
+@administrator_required
+def wifi_settings(request):
+    """WiFi configuration settings page."""
+    settings_obj = NetworkSettings.objects.first()
+    
+    if not settings_obj:
+        settings_obj = NetworkSettings.objects.create()
+    
+    context = {
+        'active_tab': 'wifi_settings',
+        'page_title': _('WiFi Settings'),
+        'settings': settings_obj,
+    }
+    
+    return render(request, 'network/wifi_settings.html', context)
+
+
+@administrator_required
+def firewall(request):
+    """Firewall rules and security settings page."""
+    context = {
+        'active_tab': 'firewall',
+        'page_title': _('Firewall'),
+    }
+    
+    return render(request, 'network/firewall.html', context)
+
+
+@technician_or_administrator_required
+def system(request):
+    """System information and settings page."""
+    context = {
+        'active_tab': 'system',
+        'page_title': _('System'),
+    }
+    
+    return render(request, 'network/system.html', context)

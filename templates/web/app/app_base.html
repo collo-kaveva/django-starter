@@ -1,7 +1,7 @@
 {% extends "web/base.html" %}
 {% load i18n %}
 {% block top_nav %}
-  {% include 'web/components/top_nav_app.html' %}
+  {% include 'network/components/top_nav.html' %}
 {% endblock %}
 {% block body %}
   {% block notifications %}
@@ -13,13 +13,13 @@
     </button>
   </div>
   <section class="section" hx-on::response-error="document.getElementById('htmx-error').classList.remove('hidden')">
-    <div class="container flex flex-row">
-      <div class="w-64 hidden lg:flex lg:sticky lg:top-21 lg:self-start">
+    <div class="flex flex-row">
+      <div class="hidden lg:block">
         {% block sidebar-nav %}
-          {% include "web/components/app_nav.html" %}
+          {% include "network/components/sidebar.html" %}
         {% endblock %}
       </div>
-      <div class="w-full min-w-0">
+      <div class="flex-1 min-w-0 p-6">
         {% block app %}
         {% endblock %}
       </div>
