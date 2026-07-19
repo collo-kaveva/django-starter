@@ -44,3 +44,21 @@
   --danger: var(--color-error);
   --success: var(--color-success);
 }
+
+/* Light mode specific styles */
+[data-theme="light"] {
+  --color-navy: #f8fafc;
+  --color-navy-light: #e2e8f0;
+  --color-navy-dark: #0B1020;
+  
+  color-scheme: light;
+}
+
+/* Dark mode specific styles */
+[data-theme="dark"] {
+  --color-navy: #0B1020;
+  --color-navy-light: #1A1F35;
+  --color-navy-dark: #0B1020;
+  
+  color-scheme: dark;
+}

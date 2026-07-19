@@ -9,6 +9,10 @@ module.exports = {
     'pg-bg-danger',
     'pg-bg-success',
   ],
+  daisyui: {
+    themes: ["light", "dark"],
+    darkTheme: "dark",
+  },
   theme: {
     extend: {
       aspectRatio: {
@@ -18,30 +22,37 @@ module.exports = {
         navy: {
           DEFAULT: '#0B1020',
           light: '#1A1F35',
+          dark: '#0B1020',
         },
         indigo: {
           DEFAULT: '#4F46E5',
           light: '#6366F1',
+          dark: '#4F46E5',
         },
         electric: {
           DEFAULT: '#3B82F6',
           light: '#60A5FA',
+          dark: '#3B82F6',
         },
         emerald: {
           DEFAULT: '#10B981',
           light: '#34D399',
+          dark: '#10B981',
         },
         orange: {
           DEFAULT: '#F59E0B',
           light: '#FBBF24',
+          dark: '#F59E0B',
         },
         rose: {
           DEFAULT: '#F43F5E',
           light: '#FB7185',
+          dark: '#F43F5E',
         },
         purple: {
           DEFAULT: '#8B5CF6',
           light: '#A78BFA',
+          dark: '#8B5CF6',
         },
       },
       fontFamily: {

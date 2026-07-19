@@ -1,14 +1,14 @@
 {% load i18n %}
-<div class="relative flex items-start gap-4 p-4 rounded-xl bg-navy-light/30 border border-white/5 hover:border-{{ color }}/30 transition-all duration-300 hover:bg-navy-light/50 group">
+<div class="relative flex items-start gap-4 p-4 rounded-xl bg-base-200/50 border border-base-300 hover:border-{{ color }}/30 transition-all duration-300 hover:bg-base-300 group">
   <div class="flex-shrink-0 w-10 h-10 rounded-full bg-{{ color }}/10 flex items-center justify-center">
     <i class="fa fa-{{ icon }} text-{{ color }}"></i>
   </div>
   <div class="flex-1 min-w-0">
     <div class="flex items-start justify-between gap-2">
-      <h4 class="font-semibold text-white text-sm">{{ title }}</h4>
-      <span class="text-xs text-base-content/40 whitespace-nowrap">{{ time }}</span>
+      <h4 class="font-semibold text-base-content text-sm">{{ title }}</h4>
+      <span class="text-xs text-base-content/60 whitespace-nowrap">{{ time }}</span>
     </div>
-    <p class="text-sm text-base-content/60 mt-1">{{ description }}</p>
+    <p class="text-sm text-base-content/80 mt-1">{{ description }}</p>
   </div>
   <div class="absolute left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-{{ color }} animate-pulse"></div>
 </div>

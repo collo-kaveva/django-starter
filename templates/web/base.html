@@ -2,7 +2,7 @@
 {% load django_vite %}
 {% load meta_tags %}
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <!--IE compatibility-->
@@ -61,7 +61,7 @@
     {% block page_head %}
     {% endblock %}
 </head>
-<body class="bg-navy text-white" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="bg-base-200 text-base-content" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 {% block body_wrapper %}
 {% block top_nav %}
   {% include 'web/components/top_nav.html' %}
@@ -77,31 +77,7 @@
 {% endblock body_wrapper %}
   {% include 'web/components/messages-js.html' %}
 {% block page_js %}
-{% endblock page_js %}
-
-<!-- Theme Toggle Script -->
-<script>
-  (function() {
-    const html = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      html.setAttribute('data-theme', savedTheme);
-    } else if (prefersDark) {
-      html.setAttribute('data-theme', 'dark');
-    } else {
-      html.setAttribute('data-theme', 'light');
-    }
-    
-    window.toggleTheme = function() {
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-    };
-  })();
-</script>
+{% endblock %}
 
 <!-- Service Worker Registration -->
 <script>

@@ -263,8 +263,10 @@ dependencies = [
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
     { name = "faker" },
+    { name = "gunicorn" },
     { name = "psycopg" },
     { name = "redis" },
+    { name = "whitenoise" },
 ]
 
 [package.dev-dependencies]
@@ -305,8 +307,10 @@ requires-dist = [
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
     { name = "faker", specifier = ">=40.31.0" },
+    { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "psycopg" },
     { name = "redis" },
+    { name = "whitenoise", specifier = ">=6.12.0" },
 ]
 
 [package.metadata.requires-dev]
