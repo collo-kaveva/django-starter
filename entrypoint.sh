@@ -15,6 +15,12 @@ fi
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
+# Create demo accounts if enabled
+if [ "$CREATE_DEMO_USERS" = "True" ] || [ "$CREATE_DEMO_USERS" = "true" ] || [ "$CREATE_DEMO_USERS" = "1" ]; then
+    echo "Creating demo accounts..."
+    python manage.py create_demo_accounts
+fi
+
 # Collect static files
 echo "Collecting static files..."
 python manage.py collectstatic --noinput

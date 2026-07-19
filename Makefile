@@ -26,7 +26,7 @@ init: setup-env ## Quickly get up and running (install deps and bootstrap the SQ
 	@npm install
 	@$(MAKE) migrate
 	@echo "Creating demo accounts"
-	@$(MAKE) manage ARGS='create_demo_accounts'
+	@CREATE_DEMO_USERS=True $(MAKE) manage ARGS='create_demo_accounts'
 	@echo ""
 	@echo "✅ Project setup complete!"
 	@echo "   Run 'make start' to launch the Django dev server at http://localhost:8000/"

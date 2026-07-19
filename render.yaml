@@ -21,6 +21,9 @@ services:
         value: True
       - key: GUNICORN_WORKERS
         value: 3
+      # Create demo accounts (set to True for demo deployments only)
+      - key: CREATE_DEMO_USERS
+        value: True
       # REDIS_URL is optional - if not set, app uses DummyCache and eager Celery tasks
       # Uncomment below to enable Redis (requires Redis service)
       # - key: REDIS_URL

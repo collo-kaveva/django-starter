@@ -133,7 +133,7 @@ This creates:
 
 ### 3. Demo Accounts
 
-Demo accounts are automatically created during `make init` for development and testing purposes:
+Demo accounts are automatically created during `make init` for development and testing purposes, controlled by the `CREATE_DEMO_USERS` environment variable.
 
 **Administrator**
 - Username: `admin`
@@ -147,13 +147,26 @@ Demo accounts are automatically created during `make init` for development and t
 - Password: `User123!`
 - Role: Network Technician (read-only access with limited device management)
 
-> **Note**: These accounts are automatically created during project setup and are intended for local development and demo purposes only.
+> **Note**: These accounts are automatically created during project setup when `CREATE_DEMO_USERS=True` and are intended for local development and demo purposes only.
 
 To recreate demo accounts at any time, run:
 
 ```bash
-make manage ARGS='create_demo_accounts'
+CREATE_DEMO_USERS=True make manage ARGS='create_demo_accounts'
 ```
+
+#### Environment Variable Control
+
+Demo account creation is controlled by the `CREATE_DEMO_USERS` environment variable:
+
+- **Local development**: Set `CREATE_DEMO_USERS=True` in `.env` (default in `.env.example`)
+- **Production**: Set `CREATE_DEMO_USERS=True` in `.env.prod` or deployment config for demo deployments
+- **Security**: For production deployments, set `CREATE_DEMO_USERS=False` or omit the variable to prevent demo account creation
+
+The `create_demo_accounts` command is idempotent:
+- Uses `update_or_create()` to avoid duplicate accounts
+- Resets passwords to known values if accounts already exist
+- Ensures proper group membership and permissions
 
 ### 4. Create Additional User Accounts (Optional)
 
@@ -383,6 +396,7 @@ The deployment is completely automated - no manual steps required!
 - The `render.yaml` configuration uses the free tier for all services
 - **Docker-based deployment** ensures consistent environments
 - **Automated migrations** run on every container startup via entrypoint script
+- **Automated demo account creation** happens when `CREATE_DEMO_USERS=True` is set
 - **Automated static file collection** happens during container startup
 - **Django Sites framework** is automatically configured with your domain
 - Workers are set to 3, which can be adjusted via the `GUNICORN_WORKERS` environment variable
@@ -525,6 +539,45 @@ make ruff-lint            # Lint code only
 ```
 
 ## Troubleshooting
+
+### Demo Accounts Not Working
+
+If demo accounts are not accessible after deployment:
+
+1. **Check if demo account creation is enabled**:
+   ```bash
+   # For local development
+   cat .env | grep CREATE_DEMO_USERS
+
+   # For Render deployment
+   # Check render.yaml has CREATE_DEMO_USERS=True
+   ```
+
+2. **Manually recreate demo accounts**:
+   ```bash
+   # Local development
+   CREATE_DEMO_USERS=True make manage ARGS='create_demo_accounts'
+
+   # Production/Docker
+   docker compose exec web python manage.py create_demo_accounts
+   # Note: Requires CREATE_DEMO_USERS=True in environment
+   ```
+
+3. **Verify account status in database**:
+   ```bash
+   make shell
+   ```
+   ```python
+   from apps.users.models import CustomUser
+   admin = CustomUser.objects.get(username='admin')
+   print(f"Admin: {admin.username}, active: {admin.is_active}, staff: {admin.is_staff}, superuser: {admin.is_superuser}")
+   ```
+
+4. **Reset demo account passwords** (if accounts exist but passwords don't work):
+   ```bash
+   CREATE_DEMO_USERS=True make manage ARGS='create_demo_accounts'
+   ```
+   This will reset passwords to the known values even if accounts already exist.
 
 ### Styles Not Loading
 - Ensure Vite dev server is running: `make npm-dev`
