@@ -340,9 +340,9 @@ NetVista is compatible with free hosting platforms:
 
 ### Render Deployment
 
-This project includes a `render.yaml` configuration file for seamless deployment to Render. The configuration sets up:
+This project includes a `render.yaml` configuration file for seamless deployment to Render using Docker. The configuration sets up:
 
-- **Web Service**: Django application with Gunicorn
+- **Web Service**: Django application with Docker
 - **PostgreSQL Database**: Managed PostgreSQL instance
 - **Redis**: Managed Redis instance for caching and Celery
 
@@ -356,42 +356,42 @@ This project includes a `render.yaml` configuration file for seamless deployment
 
 4. **Render will automatically detect the `render.yaml` file** and create the necessary services
 
-5. **Set the required environment variables** in Render's dashboard:
-   - `DJANGO_SETTINGS_MODULE`: `config.settings.prod`
-   - `DEBUG`: `False`
-   - `SECRET_KEY`: Generate with `python -c "import secrets; print(secrets.token_urlsafe(64))"`
-   - `ALLOWED_HOSTS`: Your Render domain (e.g., `your-app.onrender.com`)
-   - `USE_HTTPS_IN_ABSOLUTE_URLS`: `True`
-
-6. **Deploy** - Render will automatically:
-   - Install Python dependencies using `uv`
-   - Build frontend assets with `npm`
-   - Run database migrations
-   - Collect static files
+5. **Deploy** - Render will automatically:
+   - Build the Docker image using the Dockerfile
+   - Build frontend assets during the Docker build
+   - Run database migrations automatically on container startup
+   - Collect static files automatically on container startup
    - Start the Gunicorn server
+   - Configure the Django Sites framework with your domain
 
-#### Manual Render Setup
-
-If you prefer manual setup without `render.yaml`:
-
-1. **Create a new Web Service** in Render
-   - Runtime: Python 3
-   - Build Command: `pip install uv && uv sync --frozen --no-dev --group prod && npm ci && npm run build && python manage.py collectstatic --noinput`
-   - Start Command: `python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3`
-
-2. **Create a PostgreSQL Database** in Render
-   - Add the connection string as `DATABASE_URL` environment variable
-
-3. **Create a Redis Instance** in Render
-   - Add the connection string as `REDIS_URL` environment variable
+The deployment is completely automated - no manual steps required!
 
 #### Render-Specific Notes
 
 - The `render.yaml` configuration uses the free tier for all services
-- Workers are set to 3, which can be adjusted based on your needs
+- **Docker-based deployment** ensures consistent environments
+- **Automated migrations** run on every container startup via entrypoint script
+- **Automated static file collection** happens during container startup
+- **Django Sites framework** is automatically configured with your domain
+- Workers are set to 3, which can be adjusted via the `GUNICORN_WORKERS` environment variable
 - Static files are served via WhiteNoise (no CDN required)
-- The project automatically builds frontend assets during deployment
-- Database migrations run automatically on each deployment
+- The deployment is idempotent - safe to restart multiple times
+
+#### How It Works
+
+The deployment uses an `entrypoint.sh` script that:
+
+1. **Waits for the database** to be ready
+2. **Runs migrations** automatically (`python manage.py migrate --noinput`)
+3. **Collects static files** automatically (`python manage.py collectstatic --noinput`)
+4. **Updates Django Sites** with your Render domain
+5. **Starts Gunicorn** with the configured number of workers
+
+This ensures that every deployment has:
+- ✅ Latest database schema
+- ✅ Latest static files
+- ✅ Correct domain configuration
+- ✅ No manual intervention required
 
 ## Environment Variables
 

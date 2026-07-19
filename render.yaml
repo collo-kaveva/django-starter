@@ -1,19 +1,9 @@
 services:
   - type: web
     name: django-starter
-    env: python
+    env: docker
     region: oregon
     plan: free
-    buildCommand: |
-      pip install --upgrade pip
-      pip install uv
-      uv sync --frozen --no-dev --group prod
-      npm ci
-      npm run build
-      python manage.py collectstatic --noinput
-    startCommand: |
-      python manage.py migrate --noinput
-      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --access-logfile - --error-logfile -
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.prod
@@ -34,6 +24,8 @@ services:
         value: django-starter.onrender.com
       - key: USE_HTTPS_IN_ABSOLUTE_URLS
         value: True
+      - key: GUNICORN_WORKERS
+        value: 3
 
 databases:
   - name: django-starter-db

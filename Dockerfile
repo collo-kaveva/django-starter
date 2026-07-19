@@ -76,11 +76,12 @@ COPY --chown=django:django . /code/
 # Overlay the front-end assets built in stage 1 (bundles + manifest.json).
 COPY --from=frontend --chown=django:django /code/static /code/static
 
+# Copy and make executable the entrypoint script
+COPY --chown=django:django entrypoint.sh /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
 EXPOSE 8000
 
-# Default to gunicorn; compose overrides this for the web/celery services.
-CMD ["gunicorn", "config.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "3", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+# Use the entrypoint script which handles migrations, collectstatic, and gunicorn startup
+ENTRYPOINT ["/code/entrypoint.sh"]
+CMD []
