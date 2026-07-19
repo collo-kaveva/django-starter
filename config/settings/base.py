@@ -381,13 +381,10 @@ SPECTACULAR_SETTINGS = {
     },
 }
 # Redis, cache, and/or Celery setup
-# `or` treats an empty REDIS_URL as unset so it falls back instead of yielding an empty URL
+# Redis is now truly optional - if not configured, the app uses DummyCache and eager Celery tasks
 REDIS_URL = env("REDIS_URL", default=None) or env("REDIS_TLS_URL", default=None)
-if not REDIS_URL:
-    REDIS_HOST = env("REDIS_HOST", default="localhost")
-    REDIS_PORT = env("REDIS_PORT", default="6379")
-    REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
 
+# Configure cache based on Redis availability
 DUMMY_CACHE = {
     "BACKEND": "django.core.cache.backends.dummy.DummyCache",
 }
@@ -395,16 +392,30 @@ REDIS_CACHE = {
     "BACKEND": "django.core.cache.backends.redis.RedisCache",
     "LOCATION": REDIS_URL,
 }
-CACHES = {
-    "default": DUMMY_CACHE if DEBUG else REDIS_CACHE,
-}
 
-CELERY_BROKER_URL = CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# Use Redis cache only if REDIS_URL is configured, otherwise use DummyCache
+if REDIS_URL:
+    CACHES = {
+        "default": REDIS_CACHE,
+    }
+else:
+    CACHES = {
+        "default": DUMMY_CACHE,
+    }
 
-# Run tasks synchronously when there's no broker available (e.g. native local dev without Redis).
-# Defaults to eager in DEBUG so the app works out of the box; production (DEBUG=False) uses the broker.
-CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=DEBUG)
+# Configure Celery based on Redis availability
+if REDIS_URL:
+    CELERY_BROKER_URL = CELERY_RESULT_BACKEND = REDIS_URL
+    CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+    # Run tasks asynchronously with Redis broker
+    CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=False)
+else:
+    # No Redis configured - use eager task execution
+    CELERY_BROKER_URL = None
+    CELERY_RESULT_BACKEND = None
+    CELERY_BEAT_SCHEDULER = None
+    # Run tasks synchronously when there's no broker available
+    CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 
 # Add tasks to this dict and run `python manage.py bootstrap_celery_tasks` to create them

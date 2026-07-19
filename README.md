@@ -325,10 +325,22 @@ NetVista includes Progressive Web App functionality:
 
 The production stack uses Docker Compose with:
 - **PostgreSQL 17**: Database
-- **Redis 7**: Cache and Celery broker
+- **Redis 7**: Cache and Celery broker (optional)
 - **Gunicorn**: WSGI HTTP server
-- **Celery**: Background task processing
+- **Celery**: Background task processing (optional, requires Redis)
 - **WhiteNoise**: Static file serving
+
+**Redis is Optional**: The application can run without Redis by using Django's DummyCache and eager Celery task execution. This is suitable for:
+- Render Free plan deployments
+- Small-scale applications
+- Development environments
+- Deployments where background task processing is not critical
+
+When Redis is configured, the application gains:
+- Improved caching performance
+- Asynchronous background task processing
+- Better session management
+- Rate limiting support
 
 ### Hosting Platforms
 
@@ -393,15 +405,38 @@ This ensures that every deployment has:
 - ✅ Correct domain configuration
 - ✅ No manual intervention required
 
+#### Redis-Optional Deployment
+
+The application is designed to work with or without Redis:
+
+**Without Redis (Render Free)**:
+- Uses Django's DummyCache (no caching)
+- Celery tasks run synchronously (eager mode)
+- Perfect for small-scale applications
+- No additional service costs
+- All core functionality works (login, signup, sessions, etc.)
+
+**With Redis (Optional Upgrade)**:
+- Uses Redis for high-performance caching
+- Celery tasks run asynchronously in background
+- Better for production workloads
+- Requires Redis service (free tier available)
+- Uncomment Redis configuration in `render.yaml` to enable
+
+To enable Redis on Render:
+1. Uncomment the Redis service in `render.yaml`
+2. Uncomment the REDIS_URL environment variable
+3. Redeploy your application
+
 ## Environment Variables
 
 ### Required for Production
 - `SECRET_KEY`: Django secret key
 - `DATABASE_URL`: PostgreSQL connection string
-- `REDIS_URL`: Redis connection string
 - `ALLOWED_HOSTS`: Comma-separated list of allowed hosts
 
 ### Optional
+- `REDIS_URL`: Redis connection string (if not set, uses DummyCache and eager Celery tasks)
 - `DEBUG`: Enable/disable debug mode
 - `EMAIL_BACKEND`: Email configuration
 - `GOOGLE_ANALYTICS_ID`: Google Analytics tracking ID

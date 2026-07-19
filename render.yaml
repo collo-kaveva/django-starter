@@ -15,25 +15,28 @@ services:
         fromDatabase:
           name: django-starter-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: django-starter-redis
-          property: connectionString
       - key: ALLOWED_HOSTS
         value: django-starter.onrender.com
       - key: USE_HTTPS_IN_ABSOLUTE_URLS
         value: True
       - key: GUNICORN_WORKERS
         value: 3
+      # REDIS_URL is optional - if not set, app uses DummyCache and eager Celery tasks
+      # Uncomment below to enable Redis (requires Redis service)
+      # - key: REDIS_URL
+      #   fromService:
+      #     type: redis
+      #     name: django-starter-redis
+      #     property: connectionString
 
 databases:
   - name: django-starter-db
     databaseName: django_starter
     user: django_starter
 
-redis:
-  - name: django-starter-redis
-    region: oregon
-    plan: free
-    maxmemoryPolicy: allkeys-lru
+# Redis is optional - uncomment to enable for better performance
+# redis:
+#   - name: django-starter-redis
+#     region: oregon
+#     plan: free
+#     maxmemoryPolicy: allkeys-lru
