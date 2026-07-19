@@ -333,10 +333,65 @@ The production stack uses Docker Compose with:
 ### Hosting Platforms
 
 NetVista is compatible with free hosting platforms:
-- **Render**: Full-stack deployment
+- **Render**: Full-stack deployment (recommended)
 - **Fly.io**: Container deployment
 - **Railway**: Container deployment
 - **Heroku**: Container deployment (with add-ons)
+
+### Render Deployment
+
+This project includes a `render.yaml` configuration file for seamless deployment to Render. The configuration sets up:
+
+- **Web Service**: Django application with Gunicorn
+- **PostgreSQL Database**: Managed PostgreSQL instance
+- **Redis**: Managed Redis instance for caching and Celery
+
+#### Quick Deploy to Render
+
+1. **Push your code to GitHub** (Render works best with GitHub integration)
+
+2. **Create a new Render account** at [render.com](https://render.com)
+
+3. **Connect your GitHub repository** to Render
+
+4. **Render will automatically detect the `render.yaml` file** and create the necessary services
+
+5. **Set the required environment variables** in Render's dashboard:
+   - `DJANGO_SETTINGS_MODULE`: `config.settings.prod`
+   - `DEBUG`: `False`
+   - `SECRET_KEY`: Generate with `python -c "import secrets; print(secrets.token_urlsafe(64))"`
+   - `ALLOWED_HOSTS`: Your Render domain (e.g., `your-app.onrender.com`)
+   - `USE_HTTPS_IN_ABSOLUTE_URLS`: `True`
+
+6. **Deploy** - Render will automatically:
+   - Install Python dependencies using `uv`
+   - Build frontend assets with `npm`
+   - Run database migrations
+   - Collect static files
+   - Start the Gunicorn server
+
+#### Manual Render Setup
+
+If you prefer manual setup without `render.yaml`:
+
+1. **Create a new Web Service** in Render
+   - Runtime: Python 3
+   - Build Command: `pip install uv && uv sync --frozen --no-dev --group prod && npm ci && npm run build && python manage.py collectstatic --noinput`
+   - Start Command: `python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3`
+
+2. **Create a PostgreSQL Database** in Render
+   - Add the connection string as `DATABASE_URL` environment variable
+
+3. **Create a Redis Instance** in Render
+   - Add the connection string as `REDIS_URL` environment variable
+
+#### Render-Specific Notes
+
+- The `render.yaml` configuration uses the free tier for all services
+- Workers are set to 3, which can be adjusted based on your needs
+- Static files are served via WhiteNoise (no CDN required)
+- The project automatically builds frontend assets during deployment
+- Database migrations run automatically on each deployment
 
 ## Environment Variables
 

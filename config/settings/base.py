@@ -33,7 +33,7 @@ env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env("SECRET_KEY", default="django-insecure-2iEsfxzHLTfdRLJ3rpxS5iaBzQYMR1dXU6ZCfNaa")
 
 # SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=True)
+DEBUG = env.bool("DEBUG", default=False)
 ENABLE_DEBUG_TOOLBAR = env.bool("ENABLE_DEBUG_TOOLBAR", default=False) and "test" not in sys.argv
 
 # Note: It is not recommended to set ALLOWED_HOSTS to "*" in production
@@ -99,28 +99,43 @@ MIDDLEWARE = [
 ]
 
 if ENABLE_DEBUG_TOOLBAR:
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
-    INSTALLED_APPS.append("debug_toolbar")
-    INTERNAL_IPS = ["127.0.0.1"]
     try:
-        import socket
+        import debug_toolbar  # noqa: F401
+        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+        INSTALLED_APPS.append("debug_toolbar")
+        INTERNAL_IPS = ["127.0.0.1"]
+        try:
+            import socket
 
-        # get hostname for Docker environments
-        # See https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#configure-internal-ips
-        hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-        # add discovered IPs plus some common defaults
-        INTERNAL_IPS += [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["192.168.65.1", "10.0.2.2"]
-    except OSError as e:
-        print(f"{e} while attempting to resolve system hostname. Using INTERNAL_IPS={INTERNAL_IPS}")
+            # get hostname for Docker environments
+            # See https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#configure-internal-ips
+            hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+            # add discovered IPs plus some common defaults
+            INTERNAL_IPS += [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["192.168.65.1", "10.0.2.2"]
+        except OSError as e:
+            print(f"{e} while attempting to resolve system hostname. Using INTERNAL_IPS={INTERNAL_IPS}")
+    except ImportError:
+        # debug_toolbar not installed, skip it
+        pass
 
 # add browser reload only in debug mode
 if DEBUG:
-    INSTALLED_APPS.append("django_browser_reload")
-    MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
+    try:
+        import django_browser_reload  # noqa: F401
+        INSTALLED_APPS.append("django_browser_reload")
+        MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
+    except ImportError:
+        # django_browser_reload not installed, skip it
+        pass
 
 # add watchfiles only in debug mode
 if DEBUG:
-    INSTALLED_APPS.append("django_watchfiles")
+    try:
+        import django_watchfiles  # noqa: F401
+        INSTALLED_APPS.append("django_watchfiles")
+    except ImportError:
+        # django_watchfiles not installed, skip it
+        pass
 
 ROOT_URLCONF = "config.urls"
 
@@ -313,6 +328,20 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default=None)
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
+
+# Email failure logging
+import logging
+logger = logging.getLogger(__name__)
+
+def email_backend_log_failure(sender, message, **kwargs):
+    """Log email delivery failures for debugging."""
+    logger.error(f"Email delivery failed: {message.subject}")
+    logger.error(f"Recipients: {message.to}")
+    logger.error(f"From: {message.from_email}")
+
+if EMAIL_BACKEND != "django.core.mail.backends.console.EmailBackend":
+    from django.core.signals import email_failed
+    email_failed.connect(email_backend_log_failure)
 
 # Most production backends will require further customization. The below example uses Mailgun.
 # ANYMAIL = {

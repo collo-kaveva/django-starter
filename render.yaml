@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: django-starter
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install uv
+      uv sync --frozen --no-dev --group prod
+      npm ci
+      npm run build
+      python manage.py collectstatic --noinput
+    startCommand: |
+      python manage.py migrate --noinput
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --access-logfile - --error-logfile -
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: django-starter-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: django-starter-redis
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: django-starter.onrender.com
+      - key: USE_HTTPS_IN_ABSOLUTE_URLS
+        value: True
+
+databases:
+  - name: django-starter-db
+    databaseName: django_starter
+    user: django_starter
+
+redis:
+  - name: django-starter-redis
+    region: oregon
+    plan: free
+    maxmemoryPolicy: allkeys-lru
