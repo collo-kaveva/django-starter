@@ -18,12 +18,12 @@ export default defineConfig({
     manifest: true, // The manifest.json file is needed for django-vite
     outDir: path.resolve(__dirname, './static'), // Output directory for production build
     emptyOutDir: false, // Preserve the outDir to not clobber Django's other files.
-    rolldownOptions: {
+    rollupOptions: {
       input: {
-        'site-base-css': path.resolve(__dirname, './assets/styles/site-base.css'),
-        'site-tailwind-css': path.resolve(__dirname, './assets/styles/site-tailwind.css'),
-        'site': path.resolve(__dirname, './assets/javascript/site.js'),
-        'app': path.resolve(__dirname, './assets/javascript/app.js'),
+        'site-base-css': './assets/styles/site-base.css',
+        'site-tailwind-css': './assets/styles/site-tailwind.css',
+        'site': './assets/javascript/site.js',
+        'app': './assets/javascript/app.js',
       },
       output: {
         // Output JS bundles to js/ directory with -bundle suffix

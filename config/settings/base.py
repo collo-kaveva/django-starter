@@ -293,7 +293,7 @@ MEDIA_URL = "/media/"
 # Vite Integration
 DJANGO_VITE = {
     "default": {
-        "dev_mode": env.bool("DJANGO_VITE_DEV_MODE", default=DEBUG),
+        "dev_mode": DEBUG,  # Use Vite dev server in development, built assets in production
         "dev_server_host": env("DJANGO_VITE_HOST", default="localhost"),
         "dev_server_port": env.int("DJANGO_VITE_PORT", default=5173),
         "manifest_path": BASE_DIR / "static" / ".vite" / "manifest.json",
@@ -330,18 +330,8 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", default=None)
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
 
 # Email failure logging
-import logging
-logger = logging.getLogger(__name__)
-
-def email_backend_log_failure(sender, message, **kwargs):
-    """Log email delivery failures for debugging."""
-    logger.error(f"Email delivery failed: {message.subject}")
-    logger.error(f"Recipients: {message.to}")
-    logger.error(f"From: {message.from_email}")
-
-if EMAIL_BACKEND != "django.core.mail.backends.console.EmailBackend":
-    from django.core.signals import email_failed
-    email_failed.connect(email_backend_log_failure)
+# Note: The email_failed signal was removed in Django 6.0
+# Email failure logging can be implemented via custom email backend if needed
 
 # Most production backends will require further customization. The below example uses Mailgun.
 # ANYMAIL = {

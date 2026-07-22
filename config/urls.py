@@ -48,6 +48,9 @@ urlpatterns = [
     path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+
 # Add browser reload URL if the middleware is enabled (matches middleware check in settings.py)
 if "django_browser_reload.middleware.BrowserReloadMiddleware" in settings.MIDDLEWARE:
     urlpatterns.insert(0, path("__reload__/", include("django_browser_reload.urls")))

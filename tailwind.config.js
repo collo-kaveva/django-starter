@@ -1,6 +1,10 @@
 module.exports = {
   darkMode: ["class"],
-  content: [],
+  content: [
+    "./templates/**/*.html",
+    "./assets/javascript/**/*.js",
+    "./assets/styles/**/*.css",
+  ],
   safelist: [
     'alert-success',
     'alert-info',
