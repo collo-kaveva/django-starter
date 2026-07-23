@@ -101,6 +101,7 @@ MIDDLEWARE = [
 if ENABLE_DEBUG_TOOLBAR:
     try:
         import debug_toolbar  # noqa: F401
+
         MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
         INSTALLED_APPS.append("debug_toolbar")
         INTERNAL_IPS = ["127.0.0.1"]
@@ -122,6 +123,7 @@ if ENABLE_DEBUG_TOOLBAR:
 if DEBUG:
     try:
         import django_browser_reload  # noqa: F401
+
         INSTALLED_APPS.append("django_browser_reload")
         MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
     except ImportError:
@@ -132,6 +134,7 @@ if DEBUG:
 if DEBUG:
     try:
         import django_watchfiles  # noqa: F401
+
         INSTALLED_APPS.append("django_watchfiles")
     except ImportError:
         # django_watchfiles not installed, skip it
@@ -328,6 +331,10 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default=None)
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default=None)
+
+# Only set SMTP-specific settings if EMAIL_HOST is provided
+if EMAIL_HOST:
+    EMAIL_BACKEND = "apps.users.email_backends.LoggingEmailBackend"
 
 # Email failure logging
 # Note: The email_failed signal was removed in Django 6.0

@@ -18,6 +18,26 @@
     </div>
     <div class="navbar-end">
       {% if user.is_authenticated %}
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+          <div class="w-10 rounded-full">
+            <img alt="{{ user.get_display_name }}" src="{{ user.avatar_url }}" />
+          </div>
+        </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li>
+            <a href="{% url 'users:user_profile' %}" class="justify-between">
+              Profile
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'account_change_password' %}">Change Password</a>
+          </li>
+          <li>
+            <a href="{% url 'account_logout' %}">Logout</a>
+          </li>
+        </ul>
+      </div>
       {% else %}
       <a href="{% url 'account_signup' %}" class="btn btn-primary">
         {% translate "Sign Up" %}

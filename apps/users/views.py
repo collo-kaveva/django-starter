@@ -67,3 +67,14 @@ def upload_profile_image(request):
     else:
         readable_errors = ", ".join(str(error) for key, errors in form.errors.items() for error in errors)
         return JsonResponse(status=400, data={"errors": readable_errors})
+
+
+@login_required
+@require_POST
+def remove_profile_image(request):
+    user = request.user
+    if user.avatar:
+        user.avatar.delete()
+        user.avatar = None
+        user.save()
+    return HttpResponse(_("Profile picture removed successfully."))

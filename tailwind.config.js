@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
   darkMode: ["class"],
   content: [
     "./templates/**/*.html",
@@ -13,10 +14,6 @@ module.exports = {
     'pg-bg-danger',
     'pg-bg-success',
   ],
-  daisyui: {
-    themes: ["light", "dark"],
-    darkTheme: "dark",
-  },
   theme: {
     extend: {
       aspectRatio: {
@@ -83,9 +80,6 @@ module.exports = {
     container: {
       center: true,
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 }

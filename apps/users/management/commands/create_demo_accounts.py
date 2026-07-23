@@ -1,7 +1,7 @@
 import os
 
-from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group
+from django.core.management.base import BaseCommand
 
 from apps.users.models import CustomUser
 
@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Check if demo account creation is enabled
-        create_demo_users = os.environ.get('CREATE_DEMO_USERS', '').lower() in ('true', '1', 'yes')
+        create_demo_users = os.environ.get("CREATE_DEMO_USERS", "").lower() in ("true", "1", "yes")
 
         if not create_demo_users:
             self.stdout.write("Demo account creation is disabled (CREATE_DEMO_USERS not set to true)")

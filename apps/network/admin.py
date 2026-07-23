@@ -17,22 +17,14 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ["name", "mac_address", "ip_address", "manufacturer"]
     readonly_fields = ["created_at", "updated_at", "last_seen", "connected_since"]
     fieldsets = (
-        ("Basic Information", {
-            "fields": ("name", "device_type", "manufacturer", "status")
-        }),
-        ("Network Details", {
-            "fields": ("mac_address", "ip_address", "signal_strength")
-        }),
-        ("Performance", {
-            "fields": ("upload_speed", "download_speed")
-        }),
-        ("Organization", {
-            "fields": ("owner", "group", "notes")
-        }),
-        ("Timestamps", {
-            "fields": ("connected_since", "last_seen", "created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("Basic Information", {"fields": ("name", "device_type", "manufacturer", "status")}),
+        ("Network Details", {"fields": ("mac_address", "ip_address", "signal_strength")}),
+        ("Performance", {"fields": ("upload_speed", "download_speed")}),
+        ("Organization", {"fields": ("owner", "group", "notes")}),
+        (
+            "Timestamps",
+            {"fields": ("connected_since", "last_seen", "created_at", "updated_at"), "classes": ("collapse",)},
+        ),
     )
 
 
@@ -47,11 +39,13 @@ class AlertAdmin(admin.ModelAdmin):
     def mark_as_read(self, request, queryset):
         queryset.update(is_read=True)
         self.message_user(request, "Selected alerts marked as read.")
+
     mark_as_read.short_description = "Mark selected alerts as read"
 
     def mark_as_unread(self, request, queryset):
         queryset.update(is_read=False)
         self.message_user(request, "Selected alerts marked as unread.")
+
     mark_as_unread.short_description = "Mark selected alerts as unread"
 
 
@@ -67,28 +61,13 @@ class TrafficLogAdmin(admin.ModelAdmin):
 class NetworkSettingsAdmin(admin.ModelAdmin):
     list_display = ["ssid", "security_mode", "guest_network_enabled", "dhcp_enabled", "updated_at"]
     fieldsets = (
-        ("WiFi Settings", {
-            "fields": ("ssid", "password", "security_mode", "wifi_channel")
-        }),
-        ("Guest Network", {
-            "fields": ("guest_network_enabled", "guest_ssid", "guest_password")
-        }),
-        ("Bandwidth", {
-            "fields": ("bandwidth_limit_mbps",)
-        }),
-        ("DHCP Settings", {
-            "fields": ("dhcp_enabled", "dhcp_start_ip", "dhcp_end_ip")
-        }),
-        ("DNS Settings", {
-            "fields": ("dns_primary", "dns_secondary")
-        }),
-        ("LAN Settings", {
-            "fields": ("lan_ip",)
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("WiFi Settings", {"fields": ("ssid", "password", "security_mode", "wifi_channel")}),
+        ("Guest Network", {"fields": ("guest_network_enabled", "guest_ssid", "guest_password")}),
+        ("Bandwidth", {"fields": ("bandwidth_limit_mbps",)}),
+        ("DHCP Settings", {"fields": ("dhcp_enabled", "dhcp_start_ip", "dhcp_end_ip")}),
+        ("DNS Settings", {"fields": ("dns_primary", "dns_secondary")}),
+        ("LAN Settings", {"fields": ("lan_ip",)}),
+        ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
 
     def has_add_permission(self, request):

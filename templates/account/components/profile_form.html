@@ -4,13 +4,18 @@
   <div id="profile-picture" class="basis-1/4 grow-0 shrink-0">
     <div class="text-center">
       <img class="avatar" src="{{ user.avatar_url }}">
-      <div id='profile-upload-holder'>
+      <div id='profile-upload-holder' class="space-y-2">
         <label for="profile-upload" >
           <a id="profile-upload-label" class="btn btn-ghost">
             {% translate "Change Picture" %}
           </a>
         </label>
         <input id="profile-upload" type="file" accept="image/*"/>
+        {% if user.avatar %}
+        <button id="profile-remove-btn" class="btn btn-ghost btn-sm text-error">
+          {% translate "Remove Picture" %}
+        </button>
+        {% endif %}
       </div>
     </div>
   </div>

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.utils import timezone
 
 from apps.network.models import Alert, Device, DeviceGroup, NetworkSettings, TrafficLog
 from apps.users.models import CustomUser
@@ -9,11 +8,7 @@ class DeviceGroupModelTest(TestCase):
     """Test DeviceGroup model."""
 
     def setUp(self):
-        self.group = DeviceGroup.objects.create(
-            name="Test Group",
-            description="Test description",
-            color="#FF0000"
-        )
+        self.group = DeviceGroup.objects.create(name="Test Group", description="Test description", color="#FF0000")
 
     def test_device_group_creation(self):
         """Test device group creation."""
@@ -28,25 +23,16 @@ class DeviceGroupModelTest(TestCase):
     def test_device_group_unique_name(self):
         """Test that group names are unique."""
         with self.assertRaises(Exception):
-            DeviceGroup.objects.create(
-                name="Test Group",
-                description="Another description",
-                color="#00FF00"
-            )
+            DeviceGroup.objects.create(name="Test Group", description="Another description", color="#00FF00")
 
 
 class DeviceModelTest(TestCase):
     """Test Device model."""
 
     def setUp(self):
-        self.group = DeviceGroup.objects.create(
-            name="Test Group",
-            color="#FF0000"
-        )
+        self.group = DeviceGroup.objects.create(name="Test Group", color="#FF0000")
         self.user = CustomUser.objects.create_user(
-            username="testuser",
-            email="test@example.com",
-            password="testpass123"
+            username="testuser", email="test@example.com", password="testpass123"
         )
         self.device = Device.objects.create(
             name="Test Device",
@@ -59,7 +45,7 @@ class DeviceModelTest(TestCase):
             download_speed=50.0,
             status=Device.Status.ONLINE,
             group=self.group,
-            owner=self.user
+            owner=self.user,
         )
 
     def test_device_creation(self):
@@ -80,7 +66,7 @@ class DeviceModelTest(TestCase):
                 name="Another Device",
                 device_type=Device.DeviceType.DESKTOP,
                 mac_address="00:11:22:33:44:55",  # Same MAC
-                ip_address="192.168.1.101"
+                ip_address="192.168.1.101",
             )
 
     def test_device_last_seen_auto_update(self):
@@ -102,14 +88,14 @@ class AlertModelTest(TestCase):
             device_type=Device.DeviceType.LAPTOP,
             mac_address="00:11:22:33:44:55",
             ip_address="192.168.1.100",
-            group=self.group
+            group=self.group,
         )
         self.alert = Alert.objects.create(
             severity=Alert.Severity.WARNING,
             alert_type=Alert.AlertType.DEVICE_OFFLINE,
             title="Test Alert",
             message="Test alert message",
-            device=self.device
+            device=self.device,
         )
 
     def test_alert_creation(self):
@@ -141,12 +127,12 @@ class TrafficLogModelTest(TestCase):
             device_type=Device.DeviceType.LAPTOP,
             mac_address="00:11:22:33:44:55",
             ip_address="192.168.1.100",
-            group=self.group
+            group=self.group,
         )
         self.traffic_log = TrafficLog.objects.create(
             device=self.device,
             upload_bytes=1024 * 1024,  # 1MB
-            download_bytes=10 * 1024 * 1024  # 10MB
+            download_bytes=10 * 1024 * 1024,  # 10MB
         )
 
     def test_traffic_log_creation(self):
@@ -165,11 +151,7 @@ class NetworkSettingsModelTest(TestCase):
 
     def test_network_settings_creation(self):
         """Test network settings creation."""
-        settings = NetworkSettings.objects.create(
-            ssid="TestWiFi",
-            password="testpass123",
-            security_mode="wpa2"
-        )
+        settings = NetworkSettings.objects.create(ssid="TestWiFi", password="testpass123", security_mode="wpa2")
         self.assertEqual(settings.ssid, "TestWiFi")
         self.assertEqual(settings.security_mode, "wpa2")
 

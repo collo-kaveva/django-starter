@@ -9,7 +9,6 @@
 
 @config "../../tailwind.config.js";
 
-
 @plugin "@tailwindcss/typography";
 @plugin "daisyui";
 

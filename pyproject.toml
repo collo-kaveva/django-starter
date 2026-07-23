@@ -77,6 +77,7 @@ dependencies = [
     "drf-spectacular",
     "faker>=40.31.0",
     "gunicorn>=26.0.0",
+    "pillow>=12.3.0",
     "psycopg",
     "redis",
     "whitenoise>=6.12.0",
